@@ -1,5 +1,16 @@
+import os
+import sys
+import random
+from multiprocessing import Pool
+import numpy as np
+import scipy.optimize as optimize
+import pickle
 import inspect
+from . import session, optimization
+from .optimization import opt_fr, opt_fr_beta, cost_func_llh
 
+OPT_SAVE_SCIPY = 'opt_param_scipy_'
+OPT_SCIPY_EVALMAX = 1000
 
 # Definition of initial and bound values
 bounds_classic = [opt_fr, opt_fr_beta] 
@@ -32,9 +43,13 @@ def param_init_gen(bounds_list):
     return [random.uniform(x0, x1) for x0, x1 in bounds_list]
 
 
-def search_solution_scipy(model_func, opt_bounds, session, n_reps=opt_reps):
+def search_solution_scipy(model_func, opt_bounds, session, n_reps, models_path):
 
+  global OPT_SAVE_SCIPY
+  global OPT_SCIPY_EVALMAX
+  
   trials_file = OPT_SAVE_SCIPY + model_func.__name__ + '_' + str(session.caseid) + '.pickle'
+  trials_file = os.path.join(models_path, trials_file)
   try:    
     trials = pickle.load(open(trials_file, 'rb'))
   except:
@@ -43,6 +58,7 @@ def search_solution_scipy(model_func, opt_bounds, session, n_reps=opt_reps):
     trials['min_val'] = sys.float_info.max
     trials['n_valid'] = 0
 
+  print(f"Optimizing case {session.caseid}")
   n_reps = max(0, n_reps - trials['n_valid'])
   opt_func = opt_func_gen(model_func, session)
   #pbar = tqdm(range(n_reps), position=0, leave=True)
@@ -53,7 +69,8 @@ def search_solution_scipy(model_func, opt_bounds, session, n_reps=opt_reps):
                                 #method='SLSQP', #'TNC', 
                                 bounds=opt_bounds, 
                                 tol=1e-10,
-                                options={'maxiter': opt_evalmax})
+                                #options={'maxiter': OPT_SCIPY_EVALMAX}
+                                )
     if opt_res.success:
       if opt_res.fun < trials['min_val']:
         trials['min_val'] = opt_res.fun
@@ -64,13 +81,18 @@ def search_solution_scipy(model_func, opt_bounds, session, n_reps=opt_reps):
   return trials['min_val'], trials['params']
 
 
-def search_solution_all_scipy(model_func, opt_bound, session_list, n_reps):
+def search_solution_all_scipy(model_func, opt_bound, session_list, n_reps, models_path):
   param_dict = {}
   funct_dict = {}
+  work_args = [(model_func, opt_bound, s, n_reps, models_path) for s in session_list]  
+  #print(work_args)
+  p = Pool(3)
+  res = p.starmap(search_solution_scipy, work_args)
   #for i in tqdm(range(len(session_list)), position=0):
-  for i in range(len(session_list)):
-    print("**Optimizing session " + str(session_list[i].caseid))
-    f, p = search_solution_scipy(model_func, opt_bound, session_list[i], n_reps)
+  #for i in range(len(session_list)):
+  for f, p in res:
+    #print("**Optimizing session " + str(session_list[i].caseid))
+    #f, p = search_solution_scipy(model_func, opt_bound, session_list[i], n_reps, models_path)
     param_dict[session_list[i].caseid] = p
     funct_dict[session_list[i].caseid] = f
   return param_dict, funct_dict

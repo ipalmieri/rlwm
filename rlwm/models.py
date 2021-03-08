@@ -6,7 +6,7 @@ import numpy as np
 
 def action_softmax(action_func, beta):
   scale = 1./np.sum([np.exp(beta*f) for a, f in action_func.items()])
-    return {a: np.exp(beta*f)*scale for a, f in action_func.items()} 
+  return {a: np.exp(beta*f)*scale for a, f in action_func.items()} 
     
     
     

@@ -1,3 +1,5 @@
+import numpy as np
+
 # optmization parameters
 opt_fr = (0., 1.)
 opt_fr_beta = (0, 100)

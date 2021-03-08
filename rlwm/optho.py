@@ -1,4 +1,6 @@
+import os
 
+OPT_SAVE_HYPEROPT = os.path.join(MODEL_PATH, 'opt_param_hyperopt_')
 
 
 space_classic = {
