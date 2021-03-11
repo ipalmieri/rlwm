@@ -19,8 +19,6 @@ def aggregate_stimuli(session):
     st_rt_test = {st: np.array(rt_series) for st, rt_series in st_rt_test.items()}
 
     return st_rt_train, st_rt_test
-
-
     
     
 # Calcula a sequencia com o reward médio para cada estímulo 
@@ -43,7 +41,6 @@ def average_stimuli_probs(session_list):
     st_rt_avg_test = {st: np.mean(rts_list, axis=0) for st, rts_list in st_rt_avg_test.items()}
 
     return st_rt_avg_train, st_rt_avg_test
-
 
 
 # Calcula a sequencia com o reward médio para cada tamanho de bloco 
@@ -79,8 +76,6 @@ def average_block_probs(session_list):
 
     return bs_rt_avg_train, bs_rt_avg_test
     
-    
-    
 
 # Calcula a taxa de reward assintotica para cada tamanho de bloco 
 def aggregate_as_probs(session_list, last_train):
@@ -111,6 +106,20 @@ def aggregate_as_probs(session_list, last_train):
     return bs_as_pairs_train, bs_as_pairs_test
 
 
+# Count perseverance errors
+def count_perseverance(session_list):
 
+    pers_count = {}
+    for session in session_list:
+        pers_count[session.caseid] = 0
+        past_errs = defaultdict(set)
+        for trial in session.train_set:
+            st, ac, rt, bs = trial
+            if rt == 0:
+                if ac in past_errs[st]:
+                    pers_count[session.caseid] +=1
+                else:
+                    past_errs[st].add(ac)              
+    return pers_count
 
     
