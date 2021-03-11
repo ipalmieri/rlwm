@@ -1,6 +1,8 @@
 import os
+import hyperopt
+from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 
-OPT_SAVE_HYPEROPT = os.path.join(MODEL_PATH, 'opt_param_hyperopt_')
+OPT_SAVE_HYPEROPT = 'opt_param_hyperopt_'
 
 
 space_classic = {
@@ -56,11 +58,12 @@ def score_dict_gen(model_func, session):
   
   
 # Hyperparameter-optimization: only run if needed
-def search_solution_hopt(model_func, search_space, session, n_reps=opt_reps):
+def search_solution_hopt(model_func, search_space, session, n_reps, models_path):
 
   score_func = score_dict_gen(model_func, session)
   trials_file = OPT_SAVE_HYPEROPT + model_func.__name__ + '_' + str(session.caseid) + '.trials'
-
+  trials_file = os.path.join(models_path, trials_file)
+  
   try:    
     trials = pickle.load(open(trials_file, 'rb'))
   except:
@@ -86,13 +89,13 @@ def search_solution_hopt(model_func, search_space, session, n_reps=opt_reps):
   return best_param, best_func['loss']
 
 
-def search_solution_all_hopt(model_func, search_space, session_list, n_reps):
+def search_solution_all_hopt(model_func, search_space, session_list, n_reps, models_file):
 
   param_dict = {}
   funct_dict = {}
   for i in tqdm(range(len(session_list))):
     #print("**Optimizing session " + str(session_list[i].caseid))
-    p, f = search_solution_hopt(model_func, search_space, session_list[i], n_reps) 
+    p, f = search_solution_hopt(model_func, search_space, session_list[i], n_reps, models_file) 
     param_dict[session_list[i].caseid] = p
     funct_dict[session_list[i].caseid] = f
   return param_dict, funct_dict

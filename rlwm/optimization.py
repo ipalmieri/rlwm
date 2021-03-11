@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 # optmization parameters
 opt_fr = (0., 1.)

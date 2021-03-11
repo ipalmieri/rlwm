@@ -86,13 +86,14 @@ def search_solution_all_scipy(model_func, opt_bound, session_list, n_reps, model
   funct_dict = {}
   work_args = [(model_func, opt_bound, s, n_reps, models_path) for s in session_list]  
   #print(work_args)
-  p = Pool(3)
+  p = Pool(2)
   res = p.starmap(search_solution_scipy, work_args)
   #for i in tqdm(range(len(session_list)), position=0):
   #for i in range(len(session_list)):
-  for f, p in res:
+  for i in range(len(res)):
     #print("**Optimizing session " + str(session_list[i].caseid))
     #f, p = search_solution_scipy(model_func, opt_bound, session_list[i], n_reps, models_path)
+    f, p = res[i]
     param_dict[session_list[i].caseid] = p
     funct_dict[session_list[i].caseid] = f
   return param_dict, funct_dict
