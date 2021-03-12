@@ -13,11 +13,12 @@ OPT_SCIPY_EVALMAX = 1000
 OPT_TOL = 1e-10
 
 # Generator of each cost function
-def opt_func_gen(model_func, session):
+def generate_optfunc(model_func, session):
     def opt_func(params):
+        params = params.tolist()
         model = models.get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
-        cost_total = optmization.cost_func_llh(model, session.train_set, session.test_set)
+        cost_total = optimization.cost_func_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')
         return cost_total
     return opt_func
@@ -42,17 +43,18 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path):
         trials['n_valid'] = 0
     n_reps = max(0, n_reps - trials['n_valid'])
     # Define function and bounds for minimize()
-    opt_func = opt_func_gen(model_func, session)
+    opt_func = generate_optfunc(model_func, session)
     param_names = inspect.getfullargspec(model_func).args
     bounds_list = [opt_bounds[pname] for pname in param_names]
     # Optmization loop
-    #print(f"Optimizing case {session.caseid}")
+    print(f"Optimizing case {session.caseid}")
     #pbar = tqdm(range(n_reps), position=0, leave=True)
     #for i in pbar:
     for i in range(n_reps): 
         x_init = [random.uniform(x0, x1) for x0, x1 in bounds_list]
         opt_res = optimize.minimize(opt_func, x_init,
-                                    #method='SLSQP', #'TNC', 
+                                    #args=(model_func, session),
+                                    method='TNC', #'Powell', #'SLSQP', #'TNC', 
                                     bounds=bounds_list, 
                                     tol=OPT_TOL,
                                     #options={'maxiter': OPT_SCIPY_EVALMAX}

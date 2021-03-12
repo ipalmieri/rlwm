@@ -43,6 +43,7 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path):
     score_func = score_dict_gen(model_func, session)
     search_space = {pname : hp.uniform(pname, x[0], x[1]) for pname, x in opt_bounds.items()}
     # Main optimization loop
+    print(f"Optimizing case {session.caseid}") 
     for tcount in range(eval_start, n_reps+1, eval_step):
         #print(f'Running cycle to {tcount}')
         best_param = fmin(score_func, 

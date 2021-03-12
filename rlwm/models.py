@@ -9,7 +9,7 @@ def action_softmax(action_func, beta):
     return {a: np.exp(beta*f)*scale for a, f in action_func.items()} 
         
         
-# Main model class
+# Generic model class
 class RLWMCollins():
     '''RL model with additional mechanisms'''  
     def __init__(self, learning_rate=0.1, beta=1.0):
@@ -106,9 +106,49 @@ class RLWMCollins():
         return action
 
 
+# Classic RL model class
+class RLCollinsClassic():
+    '''RL model with additional mechanisms'''  
+    def __init__(self, learning_rate, beta):
+        self.learning_rate = learning_rate
+        self.beta = beta                    # softmax temperature
+        self.__stmap = {}                   # Map of stimuli and respective actions
+        self.__known_stimuli = set()        # stimuli already processed for init bias
+        self.__Q = {}     
+        self.__Q_init = 0.0     
+
+    def init_model(self, stimuli, actions):
+        actions = set(actions)
+        stimuli = set(stimuli)
+        self.__stmap = {st: actions for st in stimuli}
+        self.__Q_init = 1./len(actions) # alternative: 0 
+        for st in stimuli:
+            self.__Q[st] = {ac: self.__Q_init for ac in actions}
+
+    def learn_sample(self, stimulus, action, reward, block_size):
+        st, ac, rt, bs = stimulus, action, reward, block_size
+        self.__known_stimuli.add(st)
+        # Delta calculation
+        delta = rt - self.__Q[st][ac]
+        # Function updates
+        self.__Q[st][ac] = self.__Q[st][ac] + self.learning_rate*delta  
+
+    def get_policy(self, stimulus, block_size=None, test=False):
+        Q_st = self.__Q[stimulus] 
+        pi_rl = action_softmax(Q_st, self.beta)
+        return pi_rl
+
+    def get_action(self, stimulus, block_size=None, test=False):
+        pi = self.get_policy(stimulus, block_size, test)
+        actions, probs = list(pi.keys()), list(pi.values())
+        action = np.random.choice(actions, p=probs)
+        return action
+
+
+
 # Model: Classic RL
 def model_classic(learning_rate, beta):
-    model = RLWMCollins(learning_rate, beta)
+    model = RLCollinsClassic(learning_rate, beta)
     return model
 
 
@@ -154,6 +194,7 @@ def model_rlwmi(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm):
 
 # Returns a model expanding parameters into arguments
 def get_model(model_func, params):
+    #print(model_func.__name__, type(params), params)
     model = None
     if isinstance(params, dict):
         model = model_func(**params)

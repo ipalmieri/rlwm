@@ -18,7 +18,8 @@ CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29, 37, 49, 54, 57, 
 
 
 BOUNDS_CLASSIC = {'learning_rate':  (0., 1.),
-                  'beta':           (0. 100)}
+                  'beta':           (0., 100)}
+                  
 
 
 
@@ -33,13 +34,13 @@ def main():
  
 
 
-    p_sp_classic, f_sp_classic = optsp.search_solution_all_scipy(models.model_classic, 
-                                                                 BOUNDS_CLASSIC, 
-                                                                 session_list, 
-                                                                 n_reps=OPT_REPS, 
-                                                                 models_path=MODEL_PATH,
-                                                                 n_jobs=2
-                                                                 )
+    p_sp_classic, f_sp_classic = optsp.search_solution_all(models.model_classic, 
+                                                           BOUNDS_CLASSIC, 
+                                                           session_list, 
+                                                           n_reps=OPT_REPS, 
+                                                           models_path=MODEL_PATH,
+                                                           n_jobs=2
+                                                           )
     optimization.save_param_dict(os.path.join(OUTPUT_PATH, 'param_sp_classic'), p_sp_classic, f_sp_classic)
 
 

@@ -4,19 +4,19 @@ from multiprocessing import Pool
 
 
 # LLH estimation - function to be MINIMIZED
-def cost_func_llh(model, train_set, test_set):
+def cost_func_llh(model, session):
 
   prob_seq_train = []
   prob_seq_test = []
 
-  for trial in train_set:
+  for trial in session.train_set:
     st, ac, rt, bs = trial
     pi = model.get_policy(st, bs, test=False)
     ac_prob = pi[ac]
     prob_seq_train.append(ac_prob)
     model.learn_sample(st, ac, rt, bs)
 
-  for trial in test_set:
+  for trial in session.test_set:
     st, ac, rt, bs = trial
     pi = model.get_policy(st, bs, test=True)
     ac_prob = pi[ac]
@@ -35,7 +35,7 @@ def save_param_dict(filename, param_dict, func_dict=None):
     df_func = pd.DataFrame.from_dict(func_dict, orient='index', columns=['min_cost'])
   df_param = df_param.merge(df_func, how='left', left_index=True, right_index=True)
   if not (filename.endswith('.xls') or filename.endswith(".xlsx")):
-      filename = filename + str('.xls')
+      filename = filename + str('.xlsx')
   df_param.to_excel(filename, index_label='caseid')
  
 
