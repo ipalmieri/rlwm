@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from multiprocessing import Pool
+#from multiprocessing import Pool
 
 
 # LLH estimation - function to be MINIMIZED
@@ -43,18 +43,18 @@ def save_param_dict(filename, param_dict, func_dict=None):
 def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, n_reps, models_path, n_jobs=None):
     param_dict = {}
     funct_dict = {}
-    work_args = [(model_func, opt_bounds, s, n_reps, models_path) for s in session_list]
-    n_jobs = None if n_jobs <= 0 else n_jobs
-    p = Pool(processes=n_jobs)
-    res = p.starmap(opt_routine, work_args)
-    p.close()
-    p.join()
+    #work_args = [(model_func, opt_bounds, s, n_reps, models_path) for s in session_list]
+    #n_jobs = None if n_jobs <= 0 else n_jobs
+    #p = Pool(processes=n_jobs)
+    #res = p.starmap(opt_routine, work_args)
+    #p.close()
+    #p.join()
     #for i in tqdm(range(len(session_list)), position=0):
     #for i in range(len(session_list)):
     for i in range(len(res)):
         #print("**Optimizing session " + str(session_list[i].caseid))
-        #p, f = search_solution_scipy(model_func, opt_bound, session_list[i], n_reps, models_path)
-        p, f = res[i]
+        p, f = opt_routine(model_func, opt_bound, session_list[i], n_reps, models_path)
+        #p, f = res[i]
         param_dict[session_list[i].caseid] = p
         funct_dict[session_list[i].caseid] = f
     return param_dict, funct_dict
