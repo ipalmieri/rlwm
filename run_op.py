@@ -3,6 +3,7 @@ from multiprocessing import freeze_support
 import rlwm.session as session
 import rlwm.models as models
 import rlwm.optsp as optsp
+import rlwm.optho as optho
 import rlwm.optimization as optimization
 
 BASE_PATH = '/srv/black/data/rlwm'
@@ -42,6 +43,16 @@ def main():
                                                            n_jobs=2
                                                            )
     optimization.save_param_dict(os.path.join(OUTPUT_PATH, 'param_sp_classic'), p_sp_classic, f_sp_classic)
+
+
+    p_ho_classic, f_ho_classic = optho.search_solution_all(models.model_classic, 
+                                                           BOUNDS_CLASSIC, 
+                                                           session_list, 
+                                                           n_reps=2000, 
+                                                           models_path=MODEL_PATH,
+                                                           n_jobs=2
+                                                           )
+    optimization.save_param_dict(os.path.join(OUTPUT_PATH, 'param_ho_classic'), p_ho_classic, f_ho_classic)
 
 
 if __name__ == '__main__':

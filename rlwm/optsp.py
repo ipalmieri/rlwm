@@ -54,7 +54,7 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path):
         x_init = [random.uniform(x0, x1) for x0, x1 in bounds_list]
         opt_res = optimize.minimize(opt_func, x_init,
                                     #args=(model_func, session),
-                                    method='TNC', #'Powell', #'SLSQP', #'TNC', 
+                                    #method='TNC', #'Powell', #'SLSQP', #'TNC', 
                                     bounds=bounds_list, 
                                     tol=OPT_TOL,
                                     #options={'maxiter': OPT_SCIPY_EVALMAX}

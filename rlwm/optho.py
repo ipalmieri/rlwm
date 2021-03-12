@@ -2,7 +2,7 @@ import os
 import hyperopt
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 from . import optimization, models
-
+import pickle
 
 OPT_SAVE_HYPEROPT = 'opt_param_hyperopt_'
 opt_evalstep = 100
@@ -13,7 +13,7 @@ def score_dict_gen(model_func, session):
     def opt_func(params):
         model = models.get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
-        loss = optimization.cost_func_llh(model, session.train_set, session.test_set)
+        loss = optimization.cost_func_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')
         return {'loss': loss, 'status': STATUS_OK}
     return opt_func
