@@ -40,12 +40,13 @@ def save_param_dict(filename, param_dict, func_dict=None):
  
 
 # Loop for optimization in a session list, using multiprocessing 
-def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, n_reps, models_path, n_jobs):
+def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, n_reps, models_path, n_jobs=None):
     param_dict = {}
     funct_dict = {}
     work_args = [(model_func, opt_bounds, s, n_reps, models_path) for s in session_list]
-    p = Pool(n_jobs)
-    res = p.starmap(opt_routine, work_args)
+    n_jobs = None if n_jobs <= 0
+    with Pool(processes=4) as pool:
+        res = pool.starmap(opt_routine, work_args)
     #for i in tqdm(range(len(session_list)), position=0):
     #for i in range(len(session_list)):
     for i in range(len(res)):
