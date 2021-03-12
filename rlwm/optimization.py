@@ -45,8 +45,10 @@ def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, 
     funct_dict = {}
     work_args = [(model_func, opt_bounds, s, n_reps, models_path) for s in session_list]
     n_jobs = None if n_jobs <= 0 else n_jobs
-    with Pool(processes=n_jobs) as pool:
-        res = pool.starmap(opt_routine, work_args)
+    p = Pool(processess=n_jobs)
+    res = p.starmap(opt_routine, work_args)
+    p.close()
+    p.join()
     #for i in tqdm(range(len(session_list)), position=0):
     #for i in range(len(session_list)):
     for i in range(len(res)):
