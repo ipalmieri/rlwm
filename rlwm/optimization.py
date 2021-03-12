@@ -50,8 +50,8 @@ def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, 
     #p.close()
     #p.join()
     #for i in tqdm(range(len(session_list)), position=0):
-    #for i in range(len(session_list)):
-    for i in range(len(res)):
+    for i in range(len(session_list)):
+    #for i in range(len(res)):
         #print("**Optimizing session " + str(session_list[i].caseid))
         p, f = opt_routine(model_func, opt_bound, session_list[i], n_reps, models_path)
         #p, f = res[i]
