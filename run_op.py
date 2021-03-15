@@ -48,7 +48,7 @@ def main():
     p_ho_classic, f_ho_classic = optho.search_solution_all(models.model_classic, 
                                                            BOUNDS_CLASSIC, 
                                                            session_list, 
-                                                           n_reps=2000, 
+                                                           n_reps=5000, 
                                                            models_path=MODEL_PATH,
                                                            n_jobs=2
                                                            )
