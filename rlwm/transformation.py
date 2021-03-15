@@ -101,8 +101,8 @@ def aggregate_as_probs(session_list, last_train):
             as_prob = np.mean(series)
             bs_as_test[bs].append(as_prob)
 
-        bs_as_pairs_train.append((np.mean(bs_as_train[3]), np.mean(bs_as_train[6])))
-        bs_as_pairs_test.append((np.mean(bs_as_test[3]), np.mean(bs_as_test[6])))
+        bs_as_pairs_train.append({bs: np.mean(samples) for bs, samples in bs_as_train})
+        bs_as_pairs_test.append({bs: np.mean(samples) for bs, samples in bs_as_test})
 
     return bs_as_pairs_train, bs_as_pairs_test
 
