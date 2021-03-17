@@ -1,4 +1,7 @@
-sim_user_reps = 100
+import numpy as np
+from collections import defaultdict
+import copy
+from . import models
 
 
 def simulate_model_session(model, session):
@@ -26,7 +29,7 @@ def simulate_model_session(model, session):
 
 def simulate_model(model_func, params, session):
     
-    model = get_model(model_func, params)
+    model = models.get_model(model_func, params)
     model.init_model(session.possible_stimuli, session.possible_actions)
     model_session = simulate_model_session(model, session)
     return model_session
@@ -42,7 +45,7 @@ def average_rts_dict(rts_dict_list):
     return rt_avg
     
     
-def simulate_model_curves(model_func, params, session, epochs=sim_user_reps):
+def simulate_model_curves(model_func, params, session, epochs):
 
     model_session_list = []
     for i in range(epochs):
@@ -56,7 +59,7 @@ def simulate_model_curves(model_func, params, session, epochs=sim_user_reps):
     
 
 
-def simulate_all_sessions(model_func, param_dict, session_list):
+def simulate_all_sessions(model_func, param_dict, session_list, epochs):
 
     st_rt_avg_train = []
     st_rt_avg_test = []
@@ -66,7 +69,7 @@ def simulate_all_sessions(model_func, param_dict, session_list):
     for session in tqdm(session_list, position=0):
 
         params = param_dict[session.caseid]
-        curves = simulate_model_curves(model_func, params, session, sim_user_reps)
+        curves = simulate_model_curves(model_func, params, session, epochs)
         
         st_rt_avg_train.append(curves[0])
         st_rt_avg_test.append(curves[1])
