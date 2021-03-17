@@ -25,22 +25,26 @@ def generate_optfunc(model_func, session):
   
 
 # Search solution given constraints, repeating n_reps times
-def search_solution(model_func, opt_bounds, session, n_reps, models_path):
+def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
 
     global OPT_SAVE_SCIPY
     global OPT_SCIPY_EVALMAX
     global OPT_TOL
  
     # Try to load file with past runs
-    trials_file = OPT_SAVE_SCIPY + model_func.__name__ + '_' + str(session.caseid) + '.pickle'
-    trials_file = os.path.join(models_path, trials_file)
-    try:    
-        trials = pickle.load(open(trials_file, 'rb'))
-    except:
-        trials = {}
-        trials['params'] = {}
-        trials['min_val'] = sys.float_info.max
-        trials['n_valid'] = 0
+    trials_file = None
+    trials = {}
+    trials['params'] = {}
+    trials['min_val'] = sys.float_info.max
+    trials['n_valid'] = 0
+    if models_path:
+        trials_file = OPT_SAVE_SCIPY + model_func.__name__ + '_' + str(session.caseid) + '.pickle'
+        trials_file = os.path.join(models_path, trials_file)
+        try:
+            trials_p = pickle.load(open(trials_file, 'rb'))
+            trials = trials_p
+        except:
+            pass
     n_reps = max(0, n_reps - trials['n_valid'])
     # Define function and bounds for minimize()
     opt_func = generate_optfunc(model_func, session)
@@ -64,7 +68,8 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path):
                 trials['min_val'] = opt_res.fun
                 trials['params'] = {pname: v for pname, v in zip(param_names, opt_res.x.tolist())}
             trials['n_valid'] += 1
-            pickle.dump(trials, open(trials_file, "wb"))
+            if trials_file:
+                pickle.dump(trials, open(trials_file, "wb"))
         #pbar.set_description("Cost: %.2f Valid evals: %i" % (trials['min_val'], trials['n_valid']))
     return trials['params'], trials['min_val']
 

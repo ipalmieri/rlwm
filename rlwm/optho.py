@@ -20,18 +20,22 @@ def score_dict_gen(model_func, session):
     
     
 # Hyperparameter-optimization: only run if needed
-def search_solution(model_func, opt_bounds, session, n_reps, models_path):
+def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
 
     global OPT_SAVE_HYPEROPT
     global opt_evalstep
 
     # Try to load past trials file
-    trials_file = OPT_SAVE_HYPEROPT + model_func.__name__ + '_' + str(session.caseid) + '.trials'
-    trials_file = os.path.join(models_path, trials_file)
-    try:        
-        trials = pickle.load(open(trials_file, 'rb'))
-    except:
-        trials = Trials()
+    trials_file = None
+    trials = Trials()
+    if models_path:
+        trials_file = OPT_SAVE_HYPEROPT + model_func.__name__ + '_' + str(session.caseid) + '.trials'
+        trials_file = os.path.join(models_path, trials_file)
+        try:        
+            trials_p = pickle.load(open(trials_file, 'rb'))
+            trials = trials_p
+        except:
+            pass
     eval_step = opt_evalstep
     eval_start = len(trials.trials) + eval_step
     # If all trials were already run
@@ -53,7 +57,8 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path):
                           show_progressbar=False, 
                           trials = trials
                           )
-        pickle.dump(trials, open(trials_file, 'wb'))
+        if trials_file:
+            pickle.dump(trials, open(trials_file, 'wb'))
         best_func = score_func(best_param)
     return best_param, best_func['loss']
 
