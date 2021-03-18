@@ -12,7 +12,7 @@ def simulate_model_session(model, session):
         ac_i = model.get_action(st, bs, test=False)
         rt_i = session.get_reward(st, ac_i)
         out_train.append((st, ac_i, rt_i, bs))
-        model.learn_sample(st, ac, rt, bs)
+        model.learn_sample(st, ac_i, rt_i, bs)
 
     out_test = []
     for trial in session.test_set:
