@@ -79,7 +79,7 @@ def average_block_probs(session_list):
     
 
 # Calcula a taxa de reward assintotica para cada tamanho de bloco 
-def aggregate_as_probs(session_list, last_train):
+def range_block_probs(session_list, start_pos=None, end_pos=None):
 
     bs_as_pairs_train = []
     bs_as_pairs_test = []
@@ -93,7 +93,7 @@ def aggregate_as_probs(session_list, last_train):
 
         for st, series in st_rt_train.items():
             bs = session.response_map.loc[st]['Block']
-            as_prob = np.mean(series[-last_train:])
+            as_prob = np.mean(series[start_pos:end_pos])
             bs_as_train[bs].append(as_prob)
         
         for st, series in st_rt_test.items():

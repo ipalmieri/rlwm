@@ -2,12 +2,11 @@ import random
 import numpy as np
 
 
-
 # Softmax helper function
 def action_softmax(action_func, beta):
-    scale = 1./np.sum([np.exp(beta*f) for a, f in action_func.items()])
-    return {a: np.exp(beta*f)*scale for a, f in action_func.items()} 
-        
+    scale = np.sum([np.exp(beta*f) for a, f in action_func.items()])
+    sft_func = {a: np.exp(beta*f)/scale for a, f in action_func.items()} 
+    return sft_func
         
 # Generic model class
 class RLWMCollins():
@@ -131,7 +130,16 @@ class RLCollinsClassic():
         # Delta calculation
         delta = rt - self.__Q[st][ac]
         # Function updates
+        #q_before = self.__Q[st].copy()
+        #pi_before = self.get_policy(st, bs)
         self.__Q[st][ac] = self.__Q[st][ac] + self.learning_rate*delta  
+        #q_after = self.__Q[st].copy()
+        #pi_after = self.get_policy(st, bs)
+        #q_before = {k: round(v, 3) for k, v in q_before.items()}
+        #q_after = {k: round(v, 3) for k, v in q_after.items()}
+        #pi_before = {k: round(v, 3) for k, v in pi_before.items()}
+        #pi_after = {k: round(v, 3) for k, v in pi_after.items()}
+        #print(f'Learn sample: ({st}, {ac}, {rt}, {bs}): {q_before} -> {q_after}) | {pi_before} -> {pi_after}')
 
     def get_policy(self, stimulus, block_size=None, test=False):
         Q_st = self.__Q[stimulus] 

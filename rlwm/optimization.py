@@ -15,6 +15,9 @@ def cost_func_llh(model, session):
     ac_prob = pi[ac]
     prob_seq_train.append(ac_prob)
     model.learn_sample(st, ac, rt, bs)
+    #ac_i = model.get_action(st, bs, test=False)
+    #rt_i = session.get_reward(st, ac_i)
+    #model.learn_sample(st, ac_i, rt_i, bs)
 
   for trial in session.test_set:
     st, ac, rt, bs = trial
@@ -22,10 +25,10 @@ def cost_func_llh(model, session):
     ac_prob = pi[ac]
     prob_seq_test.append(ac_prob)
 
-  llh_train = - np.sum(np.log(prob_seq_train))
-  llh_test = - np.sum(np.log(prob_seq_test))
-
-  return llh_train + llh_test
+  llh_train = np.sum(np.log(prob_seq_train))
+  llh_test = np.sum(np.log(prob_seq_test))
+  cost = - (llh_train + llh_test)
+  return cost
 
 
 # Save the dict param into spreasheets
