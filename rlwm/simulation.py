@@ -4,6 +4,14 @@ import copy
 from . import models
 
 
+def simulate_model_random(model, respose_map, n_trials):
+
+    out_train = []
+    pass
+
+
+
+
 def simulate_model_session(model, session):
 
     out_train = []
@@ -27,7 +35,7 @@ def simulate_model_session(model, session):
     return model_session
 
 
-def simulate_model(model_func, params, session):
+def simulate_session(model_func, params, session):
     
     model = models.get_model(model_func, params)
     model.init_model(session.possible_stimuli, session.possible_actions)

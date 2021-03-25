@@ -59,11 +59,11 @@ def average_block_probs(session_list):
         st_rt_train, st_rt_test = aggregate_stimuli(session)
 
         for st, rt_series in st_rt_train.items():
-            bs = session.response_map.loc[st]['Block']
+            bs = session.get_blocksize(st)
             bs_rt_train[bs].append(rt_series)
 
         for st, rt_series in st_rt_test.items():
-            bs = session.response_map.loc[st]['Block']
+            bs = session.get_blocksize(st)
             bs_rt_test[bs].append(rt_series)
  
         for bs, rts_list in bs_rt_train.items():
@@ -92,12 +92,12 @@ def range_block_probs(session_list, start_pos=None, end_pos=None):
         st_rt_train, st_rt_test = aggregate_stimuli(session)
 
         for st, series in st_rt_train.items():
-            bs = session.response_map.loc[st]['Block']
+            bs = session.get_blocksize(st)
             as_prob = np.mean(series[start_pos:end_pos])
             bs_as_train[bs].append(as_prob)
         
         for st, series in st_rt_test.items():
-            bs = session.response_map.loc[st]['Block']
+            bs = session.get_blocksize(st)
             as_prob = np.mean(series)
             bs_as_test[bs].append(as_prob)
 
