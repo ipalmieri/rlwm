@@ -49,6 +49,9 @@ def main():
     opt_bounds = bounds_rlwmi
     opt_modelfunc = models.model_rlwmi
     opt_session_list = session_list
+    opt_reps = OPT_REPS
+    opt_evalmax = OPT_EVALMAX
+
 
     p_sp, f_sp = optsp.search_solution_all(model_func=opt_modelfunc,
                                            opt_bounds=opt_bounds,
