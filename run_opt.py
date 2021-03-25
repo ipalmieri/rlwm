@@ -10,7 +10,7 @@ BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados')
 OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
 MODEL_PATH = os.path.join(BASE_PATH, 'models')
-
+#MODEL_PATH = None
 OPT_REPS = 20
 OPT_EVALMAX = 1000
 
@@ -51,28 +51,32 @@ def main():
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
+    opt_filename_sp = 'param_sp_rlwmi'
+    opt_filename_ho = 'param_ho_rlwmi'
+
+    print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 
 
     p_sp, f_sp = optsp.search_solution_all(model_func=opt_modelfunc,
                                            opt_bounds=opt_bounds,
                                            session_list=opt_session_list,
                                            n_reps=opt_reps,
-                                           models_path=None,
+                                           models_path=MODEL_PATH,
                                            n_jobs=2
                                           )
 
-    optimization.save_param_dict(os.path.join(OUTPUT_PATH, 'param_sp_classic'), p_sp_classic, f_sp_classic)
+    optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename_sp), p_sp, f_sp)
 
 
 #    p_ho, f_ho = optho.search_solution_all(model_func=opt_modelfunc, 
 #                                           opt_bounds=opt_bounds, 
 #                                           session_list=opt_session_list, 
 #                                           n_reps=opt_evalmax, 
-#                                           models_path=None,
+#                                           models_path=MODEL_PATH,
 #                                           n_jobs=2
 #                                          )
 #
-#    optimization.save_param_dict(os.path.join(OUTPUT_PATH, 'param_ho_classic'), p_ho_classic, f_ho_classic)
+#    optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename_ho), p_ho, f_ho)
 
 
 if __name__ == '__main__':
