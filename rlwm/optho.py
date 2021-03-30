@@ -13,7 +13,7 @@ def score_dict_gen(model_func, session):
     def opt_func(params):
         model = models.get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
-        loss = optimization.cost_func_llh(model, session)
+        loss = optimization.cost_half_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')
         return {'loss': loss, 'status': STATUS_OK}
     return opt_func

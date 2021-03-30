@@ -56,16 +56,7 @@ class CollinsRLClassic(BaseModel):
         # Delta calculation
         delta = rt - self.__Q[st][ac]
         # Function updates
-        #q_before = self.__Q[st].copy()
-        #pi_before = self.get_policy(st, bs)
         self.__Q[st][ac] = self.__Q[st][ac] + self.learning_rate*delta  
-        #q_after = self.__Q[st].copy()
-        #pi_after = self.get_policy(st, bs)
-        #q_before = {k: round(v, 3) for k, v in q_before.items()}
-        #q_after = {k: round(v, 3) for k, v in q_after.items()}
-        #pi_before = {k: round(v, 3) for k, v in pi_before.items()}
-        #pi_after = {k: round(v, 3) for k, v in pi_after.items()}
-        #print(f'Learn sample: ({st}, {ac}, {rt}, {bs}): {q_before} -> {q_after}) | {pi_before} -> {pi_after}')
 
     def get_policy(self, stimulus, block_size=None, test=False):
         Q_st = self.__Q[stimulus] 
@@ -87,8 +78,8 @@ class CollinsRLBest(BaseModel):
         self.pers = 0.0                             # perseveration param
         self.init = 0.0                             # init bias param
         self.__stmap = {}                           # Map of stimuli and respective actions
-        self.__known_stimuli = set()    # stimuli already processed for init bias
-        self.__Q_train = {}     
+        self.__known_stimuli = set()                # stimuli already processed for init bias
+        self.__Q_train = {}      
         self.__Q_test = {}       
         self.__Q_init = 0.0     
 
@@ -152,7 +143,7 @@ class CollinsRLWM(BaseModel):
         self.eta6_wm = 0.0                      # wm weight in policy calculation
         self.coupled = coupled                  # True for RL + WM interacting model
         self.__stmap = {}                       # Map of stimuli and respective actions
-        self.__known_stimuli = set()    # stimuli already processed for init bias
+        self.__known_stimuli = set()            # stimuli already processed for init bias
         self.__Q = {}     
         self.__W = {}
         self.__Q_init = 0.0     
@@ -189,7 +180,9 @@ class CollinsRLWM(BaseModel):
         else:
             delta = rt - self.__Q[st][ac]
         # Perseveration
-        lr = self.learning_rate*(1. - self.pers) if delta < 0 else self.learning_rate
+        lr = self.learning_rate
+        if delta < 0:
+            lr = lr*(1. - self.pers)
         # Function updates
         self.__Q[st][ac] = self.__Q[st][ac] + lr*delta  
         self.__W[st][ac] = rt  
@@ -205,12 +198,87 @@ class CollinsRLWM(BaseModel):
         pi_wm = {ac: ((1. - self.eps)*p + self.eps/n_a) for ac, p in pi_wm.items()}
         # Final policy - mixed WM and RL
         if test:
-            pi = {}
-            eta_wm = self.eta3_wm if block_size == 3 else self.eta6_wm
-            for ac in Q_st.keys():
-                pi[ac] = eta_wm*pi_wm[ac] + (1. - eta_wm)*pi_rl[ac]
-            return pi
-        return pi_rl
+            return pi_rl
+        pi = {}
+        eta_wm = self.eta3_wm if block_size == 3 else self.eta6_wm
+        for ac in pi_rl.keys():
+            pi[ac] = eta_wm*pi_wm[ac] + (1. - eta_wm)*pi_rl[ac]
+        return pi
+
+
+# RLWM model class version 2
+class CollinsRLWMAlt(BaseModel):
+    '''RL model with additional mechanisms'''  
+    def __init__(self, learning_rate, beta, K, coupled=False):
+        self.alpha_rl = learning_rate
+        self.alpha_wm = learning_rate
+        self.beta = beta                        # softmax temperature
+        self.eps = 0.0                          # noise ratio
+        self.phi = 0.0                          # forgetting ratio / decay
+        self.pers = 0.0                         # perseveration param
+        self.eta_wm = 0.0                       # wm weight in policy calculation
+        self.K = K                              # WM capacity
+        self.coupled = coupled                  # True for RL + WM interacting model
+        self.__stmap = {}                       # Map of stimuli and respective actions
+        self.__known_stimuli = set()            # stimuli already processed for init bias
+        self.__Q = {}     
+        self.__W = {}
+        self.__Q_init = 0.0     
+        self.__W_init = 0.0
+
+    def init_model(self, stimuli, actions):
+        actions = set(actions)
+        stimuli = set(stimuli)
+        self.__stmap = {st: actions for st in stimuli}
+        self.__Q_init = 1./len(actions) # alternative: 0 
+        self.__W_init = 1./len(actions) # alternative: 0 
+        for st in stimuli:
+            self.__Q[st] = {ac: self.__Q_init for ac in actions}
+            self.__W[st] = {ac: self.__W_init for ac in actions}
+
+    def learn_sample(self, stimulus, action, reward, block_size):
+        #print(sample, block_size)
+        st, ac, rt = stimulus, action, reward
+        # Block size dependent parameters
+        eta_wm = self.eta_wm*min([1., self.K/block_size])
+        # Forgetting 
+        for s, actions in self.__stmap.items():
+            for a in actions:
+                #self.__Q[s][a] = (1.-self.phi)*self.__Q[s][a] + self.phi*self.__Q_init
+                self.__W[s][a] = (1.-self.phi)*self.__W[s][a] + self.phi*self.__W_init
+        # Delta calculation
+        if self.coupled:
+            delta_rl = rt - (eta_wm*self.__W[st][ac] + (1.-eta_wm)*self.__Q[st][ac])
+        else:
+            delta_rl = rt - self.__Q[st][ac]
+        delta_wm = rt - self.__W[st][ac]
+        # Perseveration
+        alpha_rl = self.alpha_rl
+        alpha_wm = self.alpha_wm
+        if rt < 1.:
+            alpha_rl = alpha_rl*(1. - self.pers)
+            alpha_wm = alpha_wm*(1. - self.pers)
+        # Function updates
+        self.__Q[st][ac] = self.__Q[st][ac] + alpha_rl*delta_rl  
+        self.__W[st][ac] = self.__W[st][ac] + alpha_wm*delta_wm 
+
+    def get_policy(self, stimulus, block_size=None, test=False):
+        Q_st = self.__Q[stimulus]
+        W_st = self.__W[stimulus]
+        pi_rl = action_softmax(Q_st, self.beta)
+        pi_wm = action_softmax(W_st, self.beta)
+        # Undirected noise
+        n_a = len(pi_rl.keys())
+        pi_rl = {ac: ((1. - self.eps)*p + self.eps/n_a) for ac, p in pi_rl.items()}
+        pi_wm = {ac: ((1. - self.eps)*p + self.eps/n_a) for ac, p in pi_wm.items()}
+        # Final policy - mixed WM and RL
+        if test:
+            return pi_rl
+        pi = {}
+        eta_wm = self.eta_wm*min([1., self.K/block_size])
+        for ac in pi_rl.keys():
+            pi[ac] = eta_wm*pi_wm[ac] + (1. - eta_wm)*pi_rl[ac]
+        return pi
 
 
 # Model: Classic RL
@@ -257,6 +325,20 @@ def model_rlwmi(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm):
     model.eta6_wm = eta6_wm
     return model
 
+
+# Model: RLWM alternative version
+def model_rlwma(alpha_rl, alpha_wm, beta, decay, pers, eps, eta_wm, K):
+    model = CollinsRLWMAlt(alpha_rl, beta, K, coupled=False)
+    model.alpha_rl = alpha_rl
+    model.alpha_wm = alpha_wm
+    model.beta = beta
+    model.phi = decay
+    model.pers = pers
+    model.eps = eps
+    model.eta_wm = eta_wm
+    model.K = K
+    return model
+     
 
 # Returns a model expanding parameters into arguments
 def get_model(model_func, params):

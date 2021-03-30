@@ -45,14 +45,24 @@ def main():
                     'eta6_wm':       (0., 1.)
                    }
 
- 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_rlwmi
+    bounds_rlwma = {'alpha_rl':     (0., 1.),
+                    'alpha_wm':     (1., 1.),
+                    'beta':         (50., 50.),
+                    'decay':        (0., 1.),
+                    'pers':         (0., 1.),
+                    'eps':          (0., 1.),
+                    'eta_wm':       (0., 1.),
+                    'K':            (5., 5.)
+                   }
+
+
+    opt_bounds = bounds_rlwma
+    opt_modelfunc = models.model_rlwma
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
-    opt_filename_sp = 'param_sp_rlwmi'
-    opt_filename_ho = 'param_ho_rlwmi'
+    opt_filename_sp = 'param_sp_rlwma'
+    opt_filename_ho = 'param_ho_rlwma'
 
     print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 

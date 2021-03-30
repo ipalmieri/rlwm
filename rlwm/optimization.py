@@ -4,7 +4,24 @@ from multiprocessing import Pool
 
 
 # LLH estimation - function to be MINIMIZED
-def cost_func_llh(model, session):
+# Includes only train phase data
+def cost_half_llh(model, session):
+
+  prob_seq_train = []
+  for trial in session.train_set:
+    st, ac, rt, bs = trial
+    pi = model.get_policy(st, bs, test=False)
+    ac_prob = pi[ac]
+    prob_seq_train.append(ac_prob)
+    model.learn_sample(st, ac, rt, bs)
+  llh_train = np.sum(np.log(prob_seq_train))
+  cost = - llh_train 
+  return cost
+
+
+# LLH estimation - function to be MINIMIZED
+# Includes train + test phases
+def cost_full_llh(model, session):
 
   prob_seq_train = []
   prob_seq_test = []

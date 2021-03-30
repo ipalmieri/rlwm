@@ -18,7 +18,7 @@ def generate_optfunc(model_func, session):
         params = params.tolist()
         model = models.get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
-        cost_total = optimization.cost_func_llh(model, session)
+        cost_total = optimization.cost_half_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')
         return cost_total
     return opt_func

@@ -4,9 +4,8 @@ import copy
 from . import models
 
 
-def simulate_model_random(model, respose_map, n_trials):
+def simulate_model_random(model, response_map, n_trials):
 
-    out_train = []
     pass
 
 
