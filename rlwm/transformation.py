@@ -123,4 +123,21 @@ def count_perseverance(session_list):
                     past_errs[st].add(ac)              
     return pers_count
 
-    
+
+# Count perseverance errors
+def count_perseverance_bs(session_list):
+
+    pers_count = {}
+    for session in session_list:
+        pers_count[session.caseid] = defaultdict(0)
+        past_errs = defaultdict(set)
+        for trial in session.train_set:
+            st, ac, rt, bs = trial
+            if rt == 0:
+                if ac in past_errs[st]:
+                    pers_count[session.caseid][bs] +=1
+                else:
+                    past_errs[st].add(ac)              
+    return pers_count
+
+ 
