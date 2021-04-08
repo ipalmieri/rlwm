@@ -181,7 +181,7 @@ class CollinsRLWM(BaseModel):
             delta = rt - self.__Q[st][ac]
         # Perseveration
         lr = self.learning_rate
-        if delta < 0:
+        if rt < 1.0: #delta < 0:
             lr = lr*(1. - self.pers)
         # Function updates
         self.__Q[st][ac] = self.__Q[st][ac] + lr*delta  
