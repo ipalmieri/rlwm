@@ -32,8 +32,29 @@ def main():
 
 
     bounds_classic = {'learning_rate': (0., 1.),
-                      'beta':          (0., 100)
+                      'beta':          (50., 50)
                      }
+
+    bounds_best = {'lr3_train':     (0., 1.),
+                   'lr6_train':     (0., 1.),
+                   'lr3_test':      (0., 1.),
+                   'lr6_test':      (0., 1.),
+                   'beta':          (50., 50.),
+                   'decay':         (0., 1.),
+                   'pers':          (0., 1.),
+                   'eps':           (0., 1.),
+                   'init':          (0., 1.),
+                  }
+
+    bounds_rlwm = {'learning_rate': (0., 1.),
+                   'beta':          (50., 50.),
+                   'decay':         (0., 1.),
+                   'pers':          (0., 1.),
+                   'eps':           (0., 1.),
+                   'init':          (0., 1.),
+                   'eta3_wm':       (0., 1.),
+                   'eta6_wm':       (0., 1.)
+                  }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
                     'beta':          (50., 50.),
