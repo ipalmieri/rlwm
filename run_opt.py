@@ -16,7 +16,7 @@ OPT_EVALMAX = 1000
 
 CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29, 37, 49, 54, 57, 59, 62, 64, 66, 72, 76, 77, 79, 84, 91, 92, 94, 97, 102, 105, 110, 118, 127, 132, 153, 155, 159, 161, 164, 166, 172, 174, 175, 178, 179, 180, 181, 182, 184, 185, 187, 189, 195, 197, 200, 201, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 214, 215, 216, 217, 218, 220, 221, 223, 224, 226, 227]
 
-CASEIDS = CASEIDS[:10]
+#CASEIDS = CASEIDS[:10]
 
 
 
@@ -66,13 +66,23 @@ def main():
                    }
 
 
-    opt_bounds = bounds_rlwmb
-    opt_modelfunc = models.model_rlwmb
+    bounds_wm = {'alpha_wm':      (1., 1.),
+                 'beta':          (50., 50.),
+                 'decay':         (0., 1.),
+                 'pers':          (0., 1.),
+                 'eps':           (0., 1.),
+                 'eta_wm':        (0., 1.),
+                 'K':             (6., 6.)
+                }
+
+
+    opt_bounds = bounds_wm
+    opt_modelfunc = models.model_wm
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
-    opt_filename_sp = 'param_sp_rlwmb'
-    opt_filename_ho = 'param_ho_rlwmb'
+    opt_filename_sp = 'param_sp_wm'
+    opt_filename_ho = 'param_ho_wm'
 
     print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 
