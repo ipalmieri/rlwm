@@ -424,7 +424,7 @@ def model_classic(learning_rate, beta):
 
 # Model: Best RL with improvements
 def model_best(lr3_train, lr6_train, lr3_test, lr6_test, beta, decay, pers, eps, init):
-    model = CollinsRLBest()
+    model = CollinsRLBest(max(lr3_train, lr6_train), beta)
     model.lr3_train = lr3_train
     model.lr6_train = lr6_train
     model.lr3_test = lr3_test

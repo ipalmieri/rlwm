@@ -97,13 +97,13 @@ def main():
                 }
 
 
-    opt_bounds = bounds_wm
-    opt_modelfunc = models.model_wm
+    opt_bounds = bounds_best
+    opt_modelfunc = models.model_best
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
-    opt_filename_sp = 'param_sp_wm'
-    opt_filename_ho = 'param_ho_wm'
+    opt_filename_sp = 'param_sp_best'
+    opt_filename_ho = 'param_ho_best'
 
     print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 
