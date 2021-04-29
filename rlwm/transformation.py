@@ -141,3 +141,36 @@ def count_perseverance_bs(session_list):
     return pers_count
 
  
+# Count last time since a correct response
+def count_delay(session):
+
+    train_delay = []
+    test_delay = []
+    last_resp = {}
+
+    i = 0
+    for trial in session.train_set:
+        st, ac, rt, bs = trial
+        delay = -1
+        if st in last_resp:
+            delay = i - last_resp[st]
+        train_delay.append(delay)
+        if rt > 0:
+            last_resp[st] = i
+        i += 1
+
+    for trial in session.test_set:
+        st, ac, rt, bs = trial
+        delay = -1
+        if st in last_resp:
+            delay = i - last_resp[st]
+        test_delay.append(delay)
+        #if rt > 0:
+        #    last_resp[st] = i
+        i += 1
+    return train_delay, test_delay
+
+
+
+
+
