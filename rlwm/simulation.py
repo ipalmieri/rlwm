@@ -1,8 +1,7 @@
 import numpy as np
 from collections import defaultdict
 import copy
-from . import models
-
+from . import models, transformation
 
 #def simulate_model_random(model, response_map, n_trials):
 #    pass
@@ -56,8 +55,8 @@ def simulate_model_curves(model_func, params, session, epochs):
         model_session = simulate_session(model_func, params, session)
         model_session_list.append(model_session)
 
-    st_rt_avg_train, st_rt_avg_test = average_stimuli_probs(model_session_list)
-    bs_rt_avg_train, bs_rt_avg_test = average_block_probs(model_session_list)
+    st_rt_avg_train, st_rt_avg_test = transformation.average_stimuli_probs(model_session_list)
+    bs_rt_avg_train, bs_rt_avg_test = transformation.average_block_probs(model_session_list)
 
     return st_rt_avg_train, st_rt_avg_test, bs_rt_avg_train, bs_rt_avg_test
 
@@ -69,8 +68,9 @@ def simulate_all_sessions(model_func, param_dict, session_list, epochs):
     bs_rt_avg_train = []
     bs_rt_avg_test = []
 
-    for session in tqdm(session_list, position=0):
+    for session in session_list:
 
+        print(f"Simulating model for session {session.caseid}")
         params = param_dict[session.caseid]
         curves = simulate_model_curves(model_func, params, session, epochs)
         
