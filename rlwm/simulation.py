@@ -4,11 +4,8 @@ import copy
 from . import models
 
 
-def simulate_model_random(model, response_map, n_trials):
-
-    pass
-
-
+#def simulate_model_random(model, response_map, n_trials):
+#    pass
 
 
 def simulate_model_session(model, session):
