@@ -53,14 +53,13 @@ def simulate_model_curves(model_func, params, session, epochs):
 
     model_session_list = []
     for i in range(epochs):
-        model_session = simulate_model(model_func, params, session)
+        model_session = simulate_session(model_func, params, session)
         model_session_list.append(model_session)
 
     st_rt_avg_train, st_rt_avg_test = average_stimuli_probs(model_session_list)
     bs_rt_avg_train, bs_rt_avg_test = average_block_probs(model_session_list)
 
     return st_rt_avg_train, st_rt_avg_test, bs_rt_avg_train, bs_rt_avg_test
-    
 
 
 def simulate_all_sessions(model_func, param_dict, session_list, epochs):
