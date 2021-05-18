@@ -107,7 +107,7 @@ def range_block_probs(session_list, start_pos=None, end_pos=None):
     return bs_as_pairs_train, bs_as_pairs_test
 
 
-# Count perseverance errors
+# Count total perseverance errors
 def count_perseverance(session_list):
 
     pers_count = {}
@@ -124,7 +124,7 @@ def count_perseverance(session_list):
     return pers_count
 
 
-# Count perseverance errors
+# Count perseverance errors by stimulus 
 def count_perseverance_bs(session_list):
 
     pers_count = {}
@@ -140,9 +140,38 @@ def count_perseverance_bs(session_list):
                     past_errs[st].add(ac)              
     return pers_count
 
- 
+
+# Mark if current trial is a perseverance error
+def count_trial_perseverance(session):
+
+    pers_train = []
+    pers_test = []
+
+    past_errs = defaultdict(set)
+
+    for trial in session.train_set:
+        st, ac, rt, bs = trial
+        pers_error = 0
+        if rt == 0:
+            if ac in past_errs[st]:
+                pers_error = 1
+            else:
+                past_errs[st].add(ac)
+        pers_train.append(pers_error)        
+
+    for trial in session.test_set:
+        st, ac, rt, bs = trial
+        pers_error = 0
+        if rt == 0:
+            if ac in past_errs[st]:
+                pers_error = 1
+        pers_test.append(pers_error)
+
+    return pers_train, pers_test
+
+
 # Count last time since a correct response
-def count_delay(session):
+def count_trial_delay(session):
 
     train_delay = []
     test_delay = []
@@ -169,6 +198,9 @@ def count_delay(session):
         #    last_resp[st] = i
         i += 1
     return train_delay, test_delay
+
+
+
 
 
 
