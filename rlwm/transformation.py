@@ -178,7 +178,7 @@ def count_trial_delay(session):
 
     for trial in session.train_set:
         st, ac, rt, bs = trial
-        delay = -1
+        delay = 0 # default value , alternative: -1
         if st in last_resp:
             delay = i - last_resp[st]
         train_delay.append(delay)
