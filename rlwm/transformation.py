@@ -129,7 +129,7 @@ def count_perseverance_bs(session_list):
 
     pers_count = {}
     for session in session_list:
-        pers_count[session.caseid] = defaultdict(0)
+        pers_count[session.caseid] = defaultdict(lambda: 0)
         past_errs = defaultdict(set)
         for trial in session.train_set:
             st, ac, rt, bs = trial
@@ -202,7 +202,7 @@ def count_trial_rpred(session):
 
     train_rpred = []
     test_rpred = []
-    count_resp = defaultdict(0)
+    count_resp = defaultdict(lambda: 0)
 
     for trial in session.train_set:
         st, ac, rt, bs = trial
