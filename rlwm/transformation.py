@@ -146,7 +146,6 @@ def count_trial_perseverance(session):
 
     pers_train = []
     pers_test = []
-
     past_errs = defaultdict(set)
 
     for trial in session.train_set:
@@ -158,7 +157,6 @@ def count_trial_perseverance(session):
             else:
                 past_errs[st].add(ac)
         pers_train.append(pers_error)        
-
     for trial in session.test_set:
         st, ac, rt, bs = trial
         pers_error = 0
@@ -176,8 +174,8 @@ def count_trial_delay(session):
     train_delay = []
     test_delay = []
     last_resp = {}
-
     i = 0
+
     for trial in session.train_set:
         st, ac, rt, bs = trial
         delay = -1
@@ -187,7 +185,6 @@ def count_trial_delay(session):
         if rt > 0:
             last_resp[st] = i
         i += 1
-
     for trial in session.test_set:
         st, ac, rt, bs = trial
         delay = -1
@@ -200,9 +197,22 @@ def count_trial_delay(session):
     return train_delay, test_delay
 
 
+# Count number of correct responses before current trial
+def count_trial_rpred(session):
 
+    train_rpred = []
+    test_rpred = []
+    count_resp = defaultdict(0)
 
-
-
-
+    for trial in session.train_set:
+        st, ac, rt, bs = trial
+        train_rpred.append(count_resp[st])
+        if rt > 0:
+            count_resp[st] += 1
+    for trial in session.test_set:
+        st, ac ,rt, bs = trial
+        test_rpred.append(count_resp[st])
+        #if rt > 0:
+        #    count_resp[st] += 1
+    return train_rpred, test_rpred
 
