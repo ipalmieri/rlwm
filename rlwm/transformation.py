@@ -231,7 +231,7 @@ def count_trial_block(session):
             current_block += 1
             current_prefix = prefix
         train_bnumber.append(current_block)
-        i += 1
+
     current_prefix = "" 
     current_block = 0
     for trial in session.test_set:
@@ -241,6 +241,5 @@ def count_trial_block(session):
             current_block += 1
             current_prefix = prefix
         test_bnumber.append(current_block)
-        i += 1
     return train_bnumber, test_bnumber
 
