@@ -216,3 +216,31 @@ def count_trial_rpred(session):
         #    count_resp[st] += 1
     return train_rpred, test_rpred
 
+# Estimate the block number sequence of each trial
+def count_trial_block(session, st_repeat):
+
+    train_bnumber = []
+    test_bnumber = []
+
+    i = 0
+    next_block_i = 0
+    current_block = 0
+    for trial in session.train_set:
+        st, ac, rt, bs = trial
+        if i >= next_block_i:
+            current_block += 1
+            next_block_i = bs*st_repeat + i
+        train_bnumber.append(current_block)
+        i += 1
+    i = 0
+    next_block_i = 0
+    current_block = 0
+    for trial in session.test_set:
+        st, ac, rt, bs = trial
+        if i >= next_block_i:
+            current_block += 1
+            next_block_i = bs*st_repeat + i
+        test_bnumber.append(current_block)
+        i += 1
+    return train_bnumber, test_bnumber
+
