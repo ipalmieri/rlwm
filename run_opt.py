@@ -9,8 +9,8 @@ import rlwm.optimization as optimization
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados')
 OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
-#MODEL_PATH = os.path.join(BASE_PATH, 'models')
-MODEL_PATH = None
+MODEL_PATH = os.path.join(BASE_PATH, 'models')
+#MODEL_PATH = None
 OPT_REPS = 20
 OPT_EVALMAX = 1000
 
@@ -32,14 +32,14 @@ def main():
 
 
     bounds_classic = {'learning_rate': (0., 1.),
-                      'beta':          (50., 50)
+                      'beta':          (0., 100)
                      }
 
     bounds_best = {'lr3_train':     (0., 1.),
                    'lr6_train':     (0., 1.),
                    'lr3_test':      (0., 1.),
                    'lr6_test':      (0., 1.),
-                   'beta':          (50., 50.),
+                   'beta':          (0., 100.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -47,7 +47,7 @@ def main():
                   }
 
     bounds_rlwm = {'learning_rate': (0., 1.),
-                   'beta':          (50., 50.),
+                   'beta':          (0., 100.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -68,16 +68,16 @@ def main():
 
     bounds_rlwma = {'alpha_rl':     (0., 1.),
                     'alpha_wm':     (1., 1.),
-                    'beta':         (50., 50.),
+                    'beta':         (0., 100.),
                     'decay':        (0., 1.),
                     'pers':         (0., 1.),
                     'eps':          (0., 1.),
                     'eta_wm':       (0., 1.),
-                    'K':            (6., 6.)
+                    'K':            (3., 3.)
                    }
 
     bounds_rlwmb = {'learning_rate': (0., 1.),
-                    'beta':          (50., 50.),
+                    'beta':          (0., 100.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -88,7 +88,7 @@ def main():
 
 
     bounds_wm = {'alpha_wm':      (1., 1.),
-                 'beta':          (50., 50.),
+                 'beta':          (0., 100.),
                  'decay':         (0., 1.),
                  'pers':          (0., 1.),
                  'eps':           (0., 1.),
@@ -97,13 +97,13 @@ def main():
                 }
 
 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_rlwmi
+    opt_bounds = bounds_classic
+    opt_modelfunc = models.model_classic
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
-    opt_filename_sp = 'param_sp_rlwmi'
-    opt_filename_ho = 'param_ho_rlwmi'
+    opt_filename_sp = 'param_sp_classic'
+    opt_filename_ho = 'param_ho_classic'
 
     print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 
@@ -113,7 +113,7 @@ def main():
                                            session_list=opt_session_list,
                                            n_reps=opt_reps,
                                            models_path=MODEL_PATH,
-                                           n_jobs=2
+                                           n_jobs=4
                                           )
 
     optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename_sp), p_sp, f_sp)

@@ -8,7 +8,7 @@ testfile_suffix = '-RLWM-Parte 2_c'
 
 
 class DataSession():
-
+    '''Base class containing experiment data'''
     def __init__(self, caseid):
         self.caseid = caseid
         self.possible_stimuli = []
@@ -33,17 +33,16 @@ class DataSession():
         session.possible_actions = list(set([trial[1] for trial in train_set]))
         session.train_set = train_set
         session.test_set = test_set
-        # Create map stimulus to response and block size 
+        # Create map stimulus to response and block size
         blocksize_dict = {trial[0]: trial[3] for trial in train_set}
         if not isinstance(response_dict, dict):
             response_dict = {trial[0]: trial[1] for trial in train_set if trial[2] > 0}
         block_col = [blocksize_dict[st] for st in session.possible_stimuli]
         respo_col = [response_dict[st] for st in session.possible_stimuli]
         session.response_map = pd.DataFrame(zip(session.possible_stimuli, respo_col, block_col),
-                                            columns=['Stimulus_Pair', 'correct_response', 'Block'])        
+                                            columns=['Stimulus_Pair', 'correct_response', 'Block'])
         session.response_map.set_index['Stimulus_Pair']
         return session
-
 
     @classmethod
     def from_df(cls, caseid, df_train, df_test):
@@ -59,6 +58,21 @@ class DataSession():
         return session
 
 
+class tsDataSession(DataSession):
+    '''Extended class adding response time to data series'''
+    def __init__(self, caseid):
+        super().__init__(caseid)
+        self.train_ts = []
+        self.test_ts = []
+
+    @classmethod
+    def from_df(cls, caseid, df_train, df_test):
+        session = super(tsDataSession, cls).from_df(caseid, df_train, df_test)
+        session.train_ts = df_train['response_time'].tolist()
+        session.test_ts = df_test['response_time'].tolist()
+        return session
+
+
 def load_dataset(caseid, data_path):
         global trainfile_suffix
         global testfile_suffix
@@ -71,6 +85,6 @@ def load_dataset(caseid, data_path):
 
 def load_session(caseid, data_path):
     df_train, df_test = load_dataset(caseid, data_path)
-    ds = DataSession.from_df(caseid, df_train, df_test)
+    ds = tsDataSession.from_df(caseid, df_train, df_test)
     return ds
-    
+
