@@ -2,7 +2,19 @@ import numpy as np
 from collections import defaultdict
 
 
-# Agrega a sequencia de rewards para cada estimulo em uma lista
+# Aggragate reward seguence into {stimulus: series} dict
+def aggregate_stimuli_trial(trial_sequence):
+
+    st_rt_list = defaultdict(list)
+
+    for trial in trial_sequence:
+        st, ac, rt, bs = trial
+        st_rt_list[st].append(rt)
+
+    st_rt_dict = {st: np.array(rt_series) for st, rt_series in st_rt_list.items()}
+    return st_rt_dict
+
+# Same as aggragate_stimuli_trial, but for both datasets of session
 def aggregate_stimuli(session):
 
     st_rt_train = defaultdict(list)
