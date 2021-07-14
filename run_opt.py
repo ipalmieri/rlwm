@@ -73,7 +73,7 @@ def main():
                     'pers':         (0., 1.),
                     'eps':          (0., 1.),
                     'eta_wm':       (0., 1.),
-                    'K':            (3., 3.)
+                    'K':            (6., 6.)
                    }
 
     bounds_rlwmb = {'learning_rate': (0., 1.),
@@ -97,37 +97,31 @@ def main():
                 }
 
 
-    opt_bounds = bounds_classic
-    opt_modelfunc = models.model_classic
+    opt_bounds = bounds_rlwmi
+    opt_modelfunc = models.model_rlwmi
+    opt_model_name = 'model_rlwmY'
+    
+    opt_solver = 'scipy'
+    opt_filename = 'param_' + opt_solver + '_' + opt_model_name
+
     opt_session_list = session_list
     opt_reps = OPT_REPS
     opt_evalmax = OPT_EVALMAX
-    opt_filename_sp = 'param_sp_classic'
-    opt_filename_ho = 'param_ho_classic'
 
     print(f'Optimizing cases {[s.caseid for s in opt_session_list]}')
 
 
-    p_sp, f_sp = optsp.search_solution_all(model_func=opt_modelfunc,
-                                           opt_bounds=opt_bounds,
-                                           session_list=opt_session_list,
-                                           n_reps=opt_reps,
-                                           models_path=MODEL_PATH,
-                                           n_jobs=4
+    params, loss = optimization.search_solution_mp(model_func=opt_modelfunc,
+                                                 opt_bounds=opt_bounds,
+                                                 session_list=opt_session_list,
+                                                 n_reps=opt_reps,
+                                                 solver=opt_solver,
+                                                 models_path=MODEL_PATH,
+                                                 model_name=opt_model_name,
+                                                 n_jobs=12
                                           )
 
-    optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename_sp), p_sp, f_sp)
-
-
-#    p_ho, f_ho = optho.search_solution_all(model_func=opt_modelfunc, 
-#                                           opt_bounds=opt_bounds, 
-#                                           session_list=opt_session_list, 
-#                                           n_reps=opt_evalmax, 
-#                                           models_path=MODEL_PATH,
-#                                           n_jobs=2
-#                                          )
-#
-#    optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename_ho), p_ho, f_ho)
+    optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename), params, loss)
 
 
 if __name__ == '__main__':

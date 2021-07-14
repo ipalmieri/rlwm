@@ -5,10 +5,8 @@ import numpy as np
 import pickle
 import inspect
 import scipy.optimize as optimize
-from . import session, optimization, models
+from . import session, models, optimization
 
-
-OPT_SAVE_SCIPY = 'opt_param_scipy_'
 OPT_SCIPY_EVALMAX = 1000
 OPT_TOL = 1e-10
 
@@ -22,26 +20,35 @@ def generate_optfunc(model_func, session):
         #print(f'Params: {params}, Cost: {cost_total}')
         return cost_total
     return opt_func
-  
+
+# Load params from model file
+def load_params(model_file):
+    params = {}
+    loss = None
+    try:
+        trials = pickle.load(open(model_file), 'rb')
+        loss = trials['min_val']
+        #num_trials = trials['n_valid']
+        params = trials['params']
+    except:
+        pass
+    return params, loss
+
 
 # Search solution given constraints, repeating n_reps times
-def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
+def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
 
-    global OPT_SAVE_SCIPY
     global OPT_SCIPY_EVALMAX
     global OPT_TOL
  
     # Try to load file with past runs
-    trials_file = None
     trials = {}
     trials['params'] = {}
     trials['min_val'] = sys.float_info.max
     trials['n_valid'] = 0
-    if models_path:
-        trials_file = OPT_SAVE_SCIPY + model_func.__name__ + '_' + str(session.caseid) + '.pickle'
-        trials_file = os.path.join(models_path, trials_file)
+    if model_file:
         try:
-            trials_p = pickle.load(open(trials_file, 'rb'))
+            trials_p = pickle.load(open(model_file, 'rb'))
             trials = trials_p
         except:
             pass
@@ -52,8 +59,6 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
     bounds_list = [opt_bounds[pname] for pname in param_names]
     # Optmization loop
     print(f"Optimizing case {session.caseid}")
-    #pbar = tqdm(range(n_reps), position=0, leave=True)
-    #for i in pbar:
     for i in range(n_reps): 
         x_init = [random.uniform(x0, x1) for x0, x1 in bounds_list]
         opt_res = optimize.minimize(opt_func, x_init,
@@ -68,19 +73,7 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
                 trials['min_val'] = opt_res.fun
                 trials['params'] = {pname: v for pname, v in zip(param_names, opt_res.x.tolist())}
             trials['n_valid'] += 1
-            if trials_file:
-                pickle.dump(trials, open(trials_file, "wb"))
-        #pbar.set_description("Cost: %.2f Valid evals: %i" % (trials['min_val'], trials['n_valid']))
+            if model_file:
+                pickle.dump(trials, open(model_file, "wb"))
     return trials['params'], trials['min_val']
 
-
-# Loop for optimization in a session list, using multiprocessing 
-def search_solution_all(model_func, opt_bounds, session_list, n_reps, models_path, n_jobs):
-    ret = optimization.search_sessions_solution(search_solution, 
-                                                model_func, 
-                                                opt_bounds, 
-                                                session_list, 
-                                                n_reps, 
-                                                models_path,
-                                                n_jobs)
-    return ret

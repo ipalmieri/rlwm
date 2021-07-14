@@ -1,12 +1,10 @@
 import os
 import hyperopt
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
-from . import optimization, models
+from . import models, optimization
 import pickle
 
-OPT_SAVE_HYPEROPT = 'opt_param_hyperopt_'
 opt_evalstep = 100
-
 
 # Generator of each cost function
 def score_dict_gen(model_func, session):
@@ -17,22 +15,33 @@ def score_dict_gen(model_func, session):
         #print(f'Params: {params}, Cost: {cost_total}')
         return {'loss': loss, 'status': STATUS_OK}
     return opt_func
-    
-    
-# Hyperparameter-optimization: only run if needed
-def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
 
-    global OPT_SAVE_HYPEROPT
+
+# Load params from model file
+def load_params(model_file):
+    params = {}
+    loss = None
+    try:
+        trials = pickle.load(open(model_file, 'rb'))
+        loss = trials.best_trial['result']['loss']
+        #num_trials = len(trials) 
+        #params = trials.best_trial['misc']['vals']
+        params = trials.argmin
+    except:
+        pass
+    return params, loss
+
+
+# Hyperparameter-optimization: only run if needed
+def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
+
     global opt_evalstep
 
     # Try to load past trials file
-    trials_file = None
     trials = Trials()
-    if models_path:
-        trials_file = OPT_SAVE_HYPEROPT + model_func.__name__ + '_' + str(session.caseid) + '.trials'
-        trials_file = os.path.join(models_path, trials_file)
+    if model_file:
         try:        
-            trials_p = pickle.load(open(trials_file, 'rb'))
+            trials_p = pickle.load(open(model_file, 'rb'))
             trials = trials_p
         except:
             pass
@@ -57,19 +66,8 @@ def search_solution(model_func, opt_bounds, session, n_reps, models_path=None):
                           show_progressbar=False, 
                           trials = trials
                           )
-        if trials_file:
-            pickle.dump(trials, open(trials_file, 'wb'))
+        if model_file:
+            pickle.dump(trials, open(model_file, 'wb'))
         best_func = score_func(best_param)
     return best_param, best_func['loss']
 
-
-# Loop for optimization in a session list, using multiprocessing 
-def search_solution_all(model_func, opt_bounds, session_list, n_reps, models_path, n_jobs):
-    ret = optimization.search_sessions_solution(search_solution,
-                                                model_func,
-                                                opt_bounds,
-                                                session_list,
-                                                n_reps,
-                                                models_path,
-                                                n_jobs)
-    return ret

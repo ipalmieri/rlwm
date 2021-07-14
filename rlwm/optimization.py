@@ -1,7 +1,10 @@
+import os
 import numpy as np
 import pandas as pd
 from multiprocessing import Pool
+from . import optsp, optho
 
+OPT_DEFAULT_SOLVER='scipy'
 
 # LLH estimation - function to be MINIMIZED
 # Includes only train phase data
@@ -57,22 +60,53 @@ def save_param_dict(filename, param_dict, func_dict=None):
   if not (filename.endswith('.xls') or filename.endswith(".xlsx")):
       filename = filename + str('.xlsx')
   df_param.to_excel(filename, index_label='caseid')
- 
+
+
+# Builds model name from optimization attributes
+def get_model_name(model_func, session, solver=OPT_DEFAULT_SOLVER, model_name=None):
+    name = 'opt_param'
+    name = name + '_' + solver + '_'
+    if model_name:
+        name = name + model_name
+    else:
+        name = name + model_func.__name__
+    name = name + '_' + str(session.caseid)
+    name = name + '.pickle'
+    return name
+
+
+# Returns optimization routine for a given solver name
+def _get_solver_module(solver):
+    if solver == 'scipy':
+        return optsp
+    if solver == 'hyperopt':
+        return optho
+    return None
+
+
+# Returns model params from model file
+def get_model_params(model_func, session, solver=OPT_DEFAULT_SOLVER, model_name=None):
+    model_file = get_model_name(model_func, session, solver, model_name)
+    params, loss = _get_solver_module(solver).load_params(model_file)
+    return params, loss
+
 
 # Loop for optimization in a session list, using multiprocessing 
-def search_sessions_solution(opt_routine, model_func, opt_bounds, session_list, n_reps, models_path, n_jobs=None):
+def search_solution_mp(model_func, opt_bounds, session_list, n_reps, solver=OPT_DEFAULT_SOLVER, models_path = None, model_name=None, n_jobs=None):
     param_dict = {}
     funct_dict = {}
-    work_args = [(model_func, opt_bounds, s, n_reps, models_path) for s in session_list]
+    opt_routine = _get_solver_module(solver).search_solution
+    work_args = []
+    for session in session_list:
+        filename = os.path.join(models_path, get_model_name(model_func, session, solver, model_name)) if models_path else None
+        args = (model_func, opt_bounds, session, n_reps, filename)
+        work_args.append(args)
     n_jobs = None if n_jobs <= 0 else n_jobs
     p = Pool(processes=n_jobs)
     res = p.starmap(opt_routine, work_args)
     p.close()
     p.join()
-    #for i in tqdm(range(len(session_list)), position=0):
-    #for i in range(len(session_list)):
-    for i in range(len(res)):
-        #print("**Optimizing session " + str(session_list[i].caseid))
+    for i in range(len(session_list)):
         #p, f = opt_routine(model_func, opt_bounds, session_list[i], n_reps, models_path)
         p, f = res[i]
         param_dict[session_list[i].caseid] = p
