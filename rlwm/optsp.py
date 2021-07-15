@@ -7,7 +7,8 @@ import inspect
 import scipy.optimize as optimize
 from . import session, models, optimization
 
-OPT_SCIPY_EVALMAX = 1000
+OPT_SCIPY_EVALMAX = 1000    # Max evaluations of a function in a repetition
+OPT_SCIPY_REPMAX = 100      # Max extra/failed repetitions of optimization
 OPT_TOL = 1e-10
 
 # Generator of each cost function
@@ -39,6 +40,7 @@ def load_params(model_file):
 def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
 
     global OPT_SCIPY_EVALMAX
+    global OPT_SCIPY_REPMAX
     global OPT_TOL
  
     # Try to load file with past runs
@@ -52,14 +54,14 @@ def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
             trials = trials_p
         except:
             pass
-    n_reps = max(0, n_reps - trials['n_valid'])
     # Define function and bounds for minimize()
     opt_func = generate_optfunc(model_func, session)
     param_names = inspect.getfullargspec(model_func).args
     bounds_list = [opt_bounds[pname] for pname in param_names]
     # Optmization loop
     print(f"Optimizing case {session.caseid}")
-    for i in range(n_reps): 
+    rep_count = 0
+    while trials['n_valid'] < n_reps and rep_count < n_reps + OPT_SCIPY_REPMAX:
         x_init = [random.uniform(x0, x1) for x0, x1 in bounds_list]
         opt_res = optimize.minimize(opt_func, x_init,
                                     #args=(model_func, session),
@@ -75,5 +77,6 @@ def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
             trials['n_valid'] += 1
             if model_file:
                 pickle.dump(trials, open(model_file, "wb"))
+        rep_count += 1
     return trials['params'], trials['min_val']
 

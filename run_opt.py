@@ -97,9 +97,9 @@ def main():
                 }
 
 
-    opt_bounds = bounds_rlwma
-    opt_modelfunc = models.model_rlwma
-    opt_model_name = 'model_rlwma_k6'
+    opt_bounds = bounds_classic
+    opt_modelfunc = models.model_classic
+    opt_model_name = 'model_classic'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name

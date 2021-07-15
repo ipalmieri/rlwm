@@ -89,8 +89,10 @@ def _get_solver_module(solver):
 
 
 # Returns model params from model file
-def get_model_params(model_func, session, solver=OPT_DEFAULT_SOLVER, model_name=None):
+def get_model_params(model_func, session, solver=OPT_DEFAULT_SOLVER, model_name=None, model_path=None):
     model_file = get_model_name(model_func, session, solver, model_name)
+    if model_path:
+        model_file = os.path.join(model_path, model_file)
     params, loss = _get_solver_module(solver).load_params(model_file)
     return params, loss
 
