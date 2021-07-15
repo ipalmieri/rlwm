@@ -27,7 +27,7 @@ def load_params(model_file):
     params = {}
     loss = None
     try:
-        trials = pickle.load(open(model_file), 'rb')
+        trials = pickle.load(open(model_file, 'rb'))
         loss = trials['min_val']
         #num_trials = trials['n_valid']
         params = trials['params']
