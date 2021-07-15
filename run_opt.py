@@ -8,8 +8,8 @@ import rlwm.optimization as optimization
 
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados')
-OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
-MODEL_PATH = os.path.join(BASE_PATH, 'models')
+OUTPUT_PATH = os.path.join(BASE_PATH, 'output/beta_50')
+MODEL_PATH = os.path.join(BASE_PATH, 'models/beta_50')
 #MODEL_PATH = None
 OPT_REPS = 20
 OPT_EVALMAX = 1000
@@ -32,14 +32,14 @@ def main():
 
 
     bounds_classic = {'learning_rate': (0., 1.),
-                      'beta':          (0., 100)
+                      'beta':          (50., 50)
                      }
 
     bounds_best = {'lr3_train':     (0., 1.),
                    'lr6_train':     (0., 1.),
                    'lr3_test':      (0., 1.),
                    'lr6_test':      (0., 1.),
-                   'beta':          (0., 100.),
+                   'beta':          (50., 50.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -47,7 +47,7 @@ def main():
                   }
 
     bounds_rlwm = {'learning_rate': (0., 1.),
-                   'beta':          (0., 100.),
+                   'beta':          (50., 50.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -57,7 +57,7 @@ def main():
                   }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
-                    'beta':          (0, 100.),
+                    'beta':          (50, 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -68,7 +68,7 @@ def main():
 
     bounds_rlwma = {'alpha_rl':     (0., 1.),
                     'alpha_wm':     (1., 1.),
-                    'beta':         (0., 100.),
+                    'beta':         (50., 50.),
                     'decay':        (0., 1.),
                     'pers':         (0., 1.),
                     'eps':          (0., 1.),
@@ -77,7 +77,7 @@ def main():
                    }
 
     bounds_rlwmb = {'learning_rate': (0., 1.),
-                    'beta':          (0., 100.),
+                    'beta':          (50., 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -88,7 +88,7 @@ def main():
 
 
     bounds_wm = {'alpha_wm':      (1., 1.),
-                 'beta':          (0., 100.),
+                 'beta':          (50., 50.),
                  'decay':         (0., 1.),
                  'pers':          (0., 1.),
                  'eps':           (0., 1.),
@@ -97,9 +97,9 @@ def main():
                 }
 
 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_rlwmi
-    opt_model_name = 'model_rlwmY'
+    opt_bounds = bounds_rlwma
+    opt_modelfunc = models.model_rlwma
+    opt_model_name = 'model_rlwma_k6'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name
@@ -118,7 +118,7 @@ def main():
                                                  solver=opt_solver,
                                                  models_path=MODEL_PATH,
                                                  model_name=opt_model_name,
-                                                 n_jobs=12
+                                                 n_jobs=8
                                           )
 
     optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename), params, loss)
