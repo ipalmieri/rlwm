@@ -4,7 +4,7 @@ from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 from . import models, optimization
 import pickle
 
-opt_evalstep = 100
+OPT_HYPEROPT_EVALSTEP = 100
 
 # Generator of each cost function
 def score_dict_gen(model_func, session):
@@ -35,7 +35,7 @@ def load_params(model_file):
 # Hyperparameter-optimization: only run if needed
 def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
 
-    global opt_evalstep
+    global OPT_HYPEROPT_EVALSTEP
 
     # Try to load past trials file
     trials = Trials()
@@ -45,29 +45,29 @@ def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
             trials = trials_p
         except:
             pass
-    eval_step = opt_evalstep
-    eval_start = len(trials.trials) + eval_step
-    # If all trials were already run
-    if len(trials.trials) >= n_reps:
-        eval_step = 1
-        n_reps = len(trials.trials)
-        eval_start = n_reps
+    eval_step = OPT_HYPEROPT_EVALSTEP
+    eval_start = len(trials.trials)
+    eval_end = max(n_reps, eval_start)
     # Define score func and search space
     score_func = score_dict_gen(model_func, session)
-    search_space = {pname : hp.uniform(pname, x[0], x[1]) for pname, x in opt_bounds.items()}
+    search_space = {}
+    for pname, x in opt_bounds.items():
+        search_space[pname] = hp.uniform(pname, x[0], x[1]) 
     # Main optimization loop
-    print(f"Optimizing case {session.caseid}") 
-    for tcount in range(eval_start, n_reps+1, eval_step):
+    print(f"Optimizing case {session.caseid}")
+    tcount = eval_start
+    while tcount <= eval_end:
         #print(f'Running cycle to {tcount}')
         best_param = fmin(score_func, 
                           search_space, 
                           algo=tpe.suggest, 
-                          max_evals=tcount,
+                          max_evals=min(tcount+eval_step, eval_end),
                           show_progressbar=False, 
                           trials = trials
                           )
         if model_file:
             pickle.dump(trials, open(model_file, 'wb'))
         best_func = score_func(best_param)
+        tcount += eval_step
     return best_param, best_func['loss']
 
