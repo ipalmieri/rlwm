@@ -68,7 +68,7 @@ def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
                                     method='SLQP', #'Powell', 'SLSQP', 'TNC'  
                                     bounds=bounds_list, 
                                     tol=OPT_TOL,
-                                    options={'disp': True},
+                                    #options={'disp': True},
                                     #options={'maxiter': OPT_SCIPY_EVALMAX}
                                     )
         if opt_res.success:
