@@ -65,10 +65,10 @@ def search_solution(model_func, opt_bounds, session, n_reps, model_file=None):
         x_init = [random.uniform(x0, x1) for x0, x1 in bounds_list]
         opt_res = optimize.minimize(opt_func, x_init,
                                     #args=(model_func, session),
-                                    method='SLSQP', #'Powell', #'SLSQP',  
+                                    method='SLQP', #'Powell', 'SLSQP', 'TNC'  
                                     bounds=bounds_list, 
                                     tol=OPT_TOL,
-                                    #options={'disp': True},
+                                    options={'disp': True},
                                     #options={'maxiter': OPT_SCIPY_EVALMAX}
                                     )
         if opt_res.success:
