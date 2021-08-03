@@ -5,16 +5,14 @@ import rlwm.models as models
 import rlwm.session as session
 import rlwm.transformation as transformation
 import rlwm.simulation as simulation
-import rlwm.optsp as optsp
-import rlwm.optho as optho
-
+import rlwm.optimization as optimization
 
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados')
-OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
-MODEL_PATH = os.path.join(BASE_PATH, 'models')
-#OUTPUT_PATH = '/tmp'
-#MODEL_PATH = None
+#OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
+#MODEL_PATH = os.path.join(BASE_PATH, 'models')
+OUTPUT_PATH = '/tmp'
+MODEL_PATH = None
 
 
 
@@ -32,28 +30,20 @@ def main():
 
 
     #CASEIDS = CASEIDS[:10]
-    #CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29,
-    #           37, 49, 54, 57, 59, 62, 64, 66, 72, 76, 77, 79, 84,
-    #           91, 92, 94, 97, 102, 105, 110, 118, 127, 132, 153, 155,
-    #           159, 161, 164]
-
-
     CASEIDS = random.sample(CASEIDS, 10)
 
-    session_list = []
 
+    session_list = []
     for id in CASEIDS:
         ds = session.load_session(id, DATA_PATH)
         session_list.append(ds)
     print(f'{len(session_list)} cases loaded')
 
 
+    # Params to be found
     opt_param_classic = {'learning_rate': 0.3,
                          'beta':            8
                         }
-    bounds_classic = {'learning_rate':  (0., 1.),
-                      'beta':           (0., 100)
-                     }
 
     opt_param_rlwmi = {'learning_rate': 0.3,
                        'beta':          8.0,
@@ -65,6 +55,11 @@ def main():
                        'eta6_wm':       0.3
                       }
 
+    # Search spaces
+    bounds_classic = {'learning_rate':  (0., 1.),
+                      'beta':           (0., 10)
+                     }
+
     bounds_rlwmi = {'learning_rate':    (0., 1.),
                        'beta':          (0., 10),
                        'decay':         (0., 1.),
@@ -75,16 +70,19 @@ def main():
                        'eta6_wm':       (0., 1.)
                       }
 
-
+    # Sim configuration
     opt_reps = 20
     opt_evalmax = 1000
-
+    opt_solver = 'scipy'
+    
     opt_params = opt_param_rlwmi
     opt_bounds = bounds_rlwmi
     opt_modelfunc = models.model_rlwmi
+    opt_model_name = None
 
-
-    opt_session = session_list[2]
+    # Reference session
+    #opt_session = session_list[0]
+    opt_session = random.choice(session_list)
 
     opt_model = models.get_model(opt_modelfunc, opt_params)
     opt_model.init_model(opt_session.possible_stimuli, opt_session.possible_actions)
@@ -94,30 +92,19 @@ def main():
     opt_session_list = [model_session]
 #    opt_session_list = [opt_session]
 
-
     print(f'Parameters to be found: {opt_params}')
-    p_sp, f_sp = optsp.search_solution_all(model_func=opt_modelfunc,
-                                           opt_bounds=opt_bounds,
-                                           session_list=opt_session_list,
-                                           n_reps=opt_reps,
-                                           models_path=None,
-                                           n_jobs=4
+
+    params, loss = optimization.search_solution_mp(model_func=opt_modelfunc,
+                                                 opt_bounds=opt_bounds,
+                                                 session_list=opt_session_list,
+                                                 n_reps=opt_reps,
+                                                 solver=opt_solver,
+                                                 models_path=MODEL_PATH,
+                                                 model_name=opt_model_name,
+                                                 n_jobs=8
                                           )
-    print(p_sp, f_sp)
 
-
-
-#    p_ho, f_ho = optho.search_solution_all(model_func=opt_modelfunc,
-#                                           opt_bounds=opt_bounds,
-#                                           session_list=opt_session_list,
-#                                           n_reps=opt_evalmax,
-#                                           models_path=None,
-#                                           n_jobs=2
-#                                          )
-#    print(p_ho, f_ho)
-
-
-
+    print(params, loss)
 
 
 if __name__ == '__main__':

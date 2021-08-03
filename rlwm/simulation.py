@@ -14,8 +14,18 @@ def simulate_model_session(model, session):
         st, ac, rt, bs = trial
         ac_i = model.get_action(st, bs, test=False)
         rt_i = session.get_reward(st, ac_i)
+        #pi_before = model.get_policy(st, block_size=bs)
+        #q_before = model._CollinsRLWMalt1__Q[st].copy()
         out_train.append((st, ac_i, rt_i, bs))
         model.learn_sample(st, ac_i, rt_i, bs)
+        #pi_after =  model.get_policy(st, block_size=bs)
+        #q_after = model._CollinsRLWMalt1__Q[st].copy()
+        #pi_before = {k: round(v, 2) for k, v in pi_before.items()}
+        #pi_after = {k: round(v, 2) for k, v in pi_after.items()}
+        #q_before = {k: round(v, 2) for k, v in q_before.items()}
+        #q_after = {k: round(v, 2) for k, v in q_after.items()}
+        #err_r = (1.0 - pi_before[ac])
+        #print(f'{trial} : {ac_i} {rt_i} err {err_r} : {pi_before} -> {pi_after} : {q_before} -> {q_after}')
 
     out_test = []
     for trial in session.test_set:
@@ -31,7 +41,8 @@ def simulate_model_session(model, session):
 
 
 def simulate_session(model_func, params, session):
-    
+ 
+    print(f'Params: {params}')
     model = models.get_model(model_func, params)
     model.init_model(session.possible_stimuli, session.possible_actions)
     model_session = simulate_model_session(model, session)

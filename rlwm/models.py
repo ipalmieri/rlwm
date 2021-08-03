@@ -259,6 +259,7 @@ class CollinsRLWMalt1(BaseModel):
             alpha_rl = alpha_rl*(1. - self.pers)
             alpha_wm = alpha_wm*(1. - self.pers)
         # Function updates
+        #print(delta_rl, alpha_rl, round(alpha_rl*delta_rl, 3))
         self.__Q[st][ac] = self.__Q[st][ac] + alpha_rl*delta_rl  
         self.__W[st][ac] = self.__W[st][ac] + alpha_wm*delta_wm 
 
