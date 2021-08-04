@@ -9,8 +9,8 @@ import rlwm.optimization as optimization
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados')
 OUTPUT_PATH = os.path.join(BASE_PATH, 'output')
-MODEL_PATH = os.path.join(BASE_PATH, 'models/geral')
-#MODEL_PATH = None
+#MODEL_PATH = os.path.join(BASE_PATH, 'models/geral')
+MODEL_PATH = None
 OPT_REPS = 20
 OPT_EVALMAX = 1000
 
@@ -57,7 +57,7 @@ def main():
                   }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
-                    'beta':          (0, 500.),
+                    'beta':          (50, 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -97,9 +97,9 @@ def main():
                 }
 
 
-    opt_bounds = bounds_rlwma
-    opt_modelfunc = models.model_rlwma
-    opt_model_name = 'model_rlwmj'
+    opt_bounds = bounds_rlwmi
+    opt_modelfunc = models.model_rlwmi
+    opt_model_name = 'model_rlwmi-debug'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name

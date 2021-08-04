@@ -42,7 +42,7 @@ def simulate_model_session(model, session):
 
 def simulate_session(model_func, params, session):
  
-    print(f'Params: {params}')
+    #print(f'Params: {params}')
     model = models.get_model(model_func, params)
     model.init_model(session.possible_stimuli, session.possible_actions)
     model_session = simulate_model_session(model, session)
