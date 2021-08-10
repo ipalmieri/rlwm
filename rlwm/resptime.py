@@ -77,8 +77,8 @@ def average_block_ts(session_list, st_limits=None):
         for bs, ts_list in bs_ts_test.items():
             bs_ts_avg_test[bs].append(np.nanmean(ts_list, axis=0))
 
-    bs_ts_avg_train = {bs: np.mean(ts_list, axis=0) for bs, ts_list in bs_ts_avg_train.items()}
-    bs_ts_avg_test = {bs: np.mean(ts_list, axis=0) for bs, ts_list in bs_ts_avg_test.items()}
+    bs_ts_avg_train = {bs: np.nanmean(ts_list, axis=0) for bs, ts_list in bs_ts_avg_train.items()}
+    bs_ts_avg_test = {bs: np.nanmean(ts_list, axis=0) for bs, ts_list in bs_ts_avg_test.items()}
 
     return bs_ts_avg_train, bs_ts_avg_test
 
