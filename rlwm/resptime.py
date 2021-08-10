@@ -50,7 +50,7 @@ def average_stimuli_ts(session_list, st_limits=None):
 
 
 # Calculates sequence with average resonse time for each block size
-def average_block_ts(session_listi, st_limits=None):
+def average_block_ts(session_list, st_limits=None):
 
     bs_ts_avg_train = defaultdict(list)
     bs_ts_avg_test = defaultdict(list)
