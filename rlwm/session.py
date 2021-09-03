@@ -3,8 +3,8 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
-trainfile_suffix = '-RLWM-Parte 1_c'
-testfile_suffix = '-RLWM-Parte 2_c'
+trainfile_root = '-RLWM-Parte 1_'
+testfile_root = '-RLWM-Parte 2_'
 
 
 class DataSession():
@@ -73,18 +73,18 @@ class tsDataSession(DataSession):
         return session
 
 
-def load_dataset(caseid, data_path):
-        global trainfile_suffix
-        global testfile_suffix
-        train_filename = str(caseid) + trainfile_suffix + '.csv'
-        test_filename = str(caseid) + testfile_suffix + '.csv'
+def load_dataset(caseid, data_path, suffix=''):
+        global trainfile_root
+        global testfile_root
+        train_filename = str(caseid) + trainfile_root + suffix + '.csv'
+        test_filename = str(caseid) + testfile_root + suffix + '.csv'
         df_train = pd.read_csv(os.path.join(data_path, train_filename), sep=',')
         df_test = pd.read_csv(os.path.join(data_path, test_filename), sep=',')
         return df_train, df_test
 
 
-def load_session(caseid, data_path):
-    df_train, df_test = load_dataset(caseid, data_path)
+def load_session(caseid, data_path, suffix=''):
+    df_train, df_test = load_dataset(caseid, data_path, suffix)
     ds = tsDataSession.from_df(caseid, df_train, df_test)
     return ds
 
