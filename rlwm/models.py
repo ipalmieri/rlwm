@@ -9,6 +9,10 @@ def action_softmax(action_func, beta):
     sft_func = {a: np.exp(beta*f)/scale for a, f in action_func.items()} 
     return sft_func
         
+# Helper function to extract stimulus prefix
+def get_stimulus_group(stimulus):
+    return stimulus[:-1]
+
 # Base model
 class BaseModel(ABC):
     
@@ -416,6 +420,93 @@ class CollinsWM(BaseModel):
         return pi
 
 
+# Collins RLWMi + deduction
+class RLWMnew1(BaseModel):
+    '''RLWM model with deduction of non random answers'''  
+    def __init__(self, learning_rate, beta, coupled=False):
+        self.learning_rate = learning_rate
+        self.beta = beta                        # softmax temperature
+        self.eps = 0.0                          # noise ratio
+        self.phi = 0.0                          # forgetting ratio / decay
+        self.pers = 0.0                         # perseveration param
+        self.init = 0.0                         # init bias param
+        self.eta3_wm = 0.0                      # wm weight in policy calculation
+        self.eta6_wm = 0.0                      # wm weight in policy calculation
+        self.coupled = coupled                  # True for RL + WM interacting model
+        self.__stmap = {}                       # Map of stimuli and respective actions
+        self.__known_stimuli = set()            # stimuli already processed for init bias
+        self.__known_answers = {}
+        self.__Q = {}     
+        self.__W = {}
+        self.__Q_init = 0.0     
+        self.__W_init = 0.0
+
+    def init_model(self, stimuli, actions):
+        actions = set(actions)
+        stimuli = set(stimuli)
+        self.__stmap = {st: actions for st in stimuli}
+        self.__Q_init = 1./len(actions) # alternative: 0 
+        self.__W_init = 1./len(actions) # alternative: 0 
+        for st in stimuli:
+            self.__Q[st] = {ac: self.__Q_init for ac in actions}
+            self.__W[st] = {ac: self.__W_init for ac in actions}
+
+    def learn_sample(self, stimulus, action, reward, block_size):
+        #print(sample, block_size)
+        st, ac, rt = stimulus, action, reward
+        # Block size dependent parameters
+        eta_wm = self.eta3_wm if block_size == 3 else self.eta6_wm
+        # Forgetting - fix to case with different Q/W
+        if self.phi > 0:
+            for s, actions in self.__stmap.items():
+                for a in actions:
+                    self.__Q[s][a] = (1.-self.phi)*self.__Q[s][a] + self.phi*self.__Q_init
+                    self.__W[s][a] = (1.-self.phi)*self.__W[s][a] + self.phi*self.__W_init
+        # Initial bias update  
+        if st not in self.__known_stimuli:
+            self.__Q[st][ac] = self.__Q_init + self.init*(1.0 - self.__Q_init)
+            self.__known_stimuli.add(st)
+        # Rewarding deduction/induction 
+        if st not in self.__known_answers and rt > 0:
+            st_group = get_stimulus_group(st)
+            st_coef = 1. - (3./block_size)
+            for s, actions in self.__stmap.items():
+                if s != st and get_stimulus_group(s) == st_group:
+                    # Change here to affect only one learning mechanism
+                    self.__Q[s][ac] = self.__Q[s][ac]*st_coef
+                    self.__W[s][ac] = self.__W[s][ac]*st_coef
+            self.__known_answers[st] = ac        
+        # Delta calculation
+        if self.coupled:
+            delta = rt - (eta_wm*self.__W[st][ac] + (1.-eta_wm)*self.__Q[st][ac])
+        else:
+            delta = rt - self.__Q[st][ac]
+        # Perseveration
+        lr = self.learning_rate
+        if delta < 0.:
+            lr = lr*(1. - self.pers)
+        # Function updates
+        self.__Q[st][ac] = self.__Q[st][ac] + lr*delta  
+        self.__W[st][ac] = rt  
+
+    def get_policy(self, stimulus, block_size=None, test=False):
+        Q_st = self.__Q[stimulus]
+        W_st = self.__W[stimulus]
+        pi_rl = action_softmax(Q_st, self.beta)
+        pi_wm = action_softmax(W_st, self.beta)
+        # Undirected noise
+        n_a = len(pi_rl.keys())
+        pi_rl = {ac: ((1. - self.eps)*p + self.eps/n_a) for ac, p in pi_rl.items()}
+        pi_wm = {ac: ((1. - self.eps)*p + self.eps/n_a) for ac, p in pi_wm.items()}
+        # Final policy - mixed WM and RL
+        if test:
+            return pi_rl
+        pi = {}
+        eta_wm = self.eta3_wm if block_size == 3 else self.eta6_wm
+        for ac in pi_rl.keys():
+            pi[ac] = eta_wm*pi_wm[ac] + (1. - eta_wm)*pi_rl[ac]
+        return pi
+
 
 # Model: Classic RL
 def model_classic(learning_rate, beta):
@@ -498,7 +589,18 @@ def model_wm(alpha_wm, beta, decay, pers, eps, eta_wm, K):
     model.eta_wm = eta_wm
     model.K = K
     return model
- 
+
+# Model: interacting RL+WM
+def model_new1(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm):
+    model = RLWMnew1(learning_rate, beta, coupled=True)
+    model.phi = decay
+    model.pers = pers
+    model.eps = eps
+    model.init = init
+    model.eta3_wm = eta3_wm
+    model.eta6_wm = eta6_wm
+    return model
+
 # Returns a model expanding parameters into arguments
 def get_model(model_func, params):
     #print(model_func.__name__, type(params), params)

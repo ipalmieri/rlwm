@@ -6,19 +6,30 @@ import rlwm.optsp as optsp
 import rlwm.optho as optho
 import rlwm.optimization as optimization
 
+RUN_BATCH='batch01'
+RUN_SUFFIX='c'
+RUN_CNR='beta_50'
+
 BASE_PATH = '/srv/black/data/rlwm'
-DATA_PATH = os.path.join(BASE_PATH, 'dados/batch03rnd')
-OUTPUT_PATH = os.path.join(BASE_PATH, 'output/batch03rnd/beta_50')
-MODEL_PATH = os.path.join(BASE_PATH, 'models/batch03rnd/beta_50')
+DATA_PATH = os.path.join(BASE_PATH, 'dados', RUN_BATCH)
+OUTPUT_PATH = os.path.join(BASE_PATH, 'output', RUN_BATCH, RUN_CNR)
+MODEL_PATH = os.path.join(BASE_PATH, 'models', RUN_BATCH, RUN_CNR)
 #MODEL_PATH = None
 OPT_REPS = 20
 OPT_EVALMAX = 1000
 
-#CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29, 37, 49, 54, 57, 59, 62, 64, 66, 72, 76, 77, 79, 84, 91, 92, 94, 97, 102, 105, 110, 118, 127, 132, 153, 155, 159, 161, 164, 166, 172, 174, 175, 178, 179, 180, 181, 182, 184, 185, 187, 189, 195, 197, 200, 201, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 214, 215, 216, 217, 218, 220, 221, 223, 224, 226, 227]
+
+# BaTCH 01
+CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29, 37, 49, 54, 57, 59, 62, 64, 66, 72, 76, 77, 79, 84, 91, 92, 94, 97, 102, 105, 110, 118, 127, 132, 153, 155, 159, 161, 164, 166, 172, 174, 175, 178, 179, 180, 181, 182, 184, 185, 187, 189, 195, 197, 200, 201, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 214, 215, 216, 217, 218, 220, 221, 223, 224, 226, 227]
 
 
-# REMOVIDO 109, 126, 264
-CASEIDS = [4, 6, 19, 33, 48, 52, 59, 62, 64, 66, 73, 76, 85, 88, 93, 97, 112, 118, 131, 137, 138, 143, 147, 148, 153, 158, 166, 169, 172, 181, 189, 190, 193, 200, 220, 222, 228, 239, 241, 244, 247, 248, 249, 250, 251, 253, 254, 259, 262, 274, 281, 282, 288, 292, 293, 295, 305, 307, 310, 318, 319, 319, 320, 325, 326, 331, 332, 334, 336, 340, 342, 356, 358, 360, 367, 370, 377, 378, 403, 404, 411, 414, 418, 424 ]
+# BATCH 02
+#CASEIDS = [1, 130, 257, 8, 10, 140, 13, 142, 18, 20, 21, 150, 23, 406, 27, 155, 283, 285, 417, 37, 165, 167, 42, 44, 51, 179, 182, 55, 56, 183, 184, 186, 188, 314, 324, 71, 203, 80, 209, 82, 211, 337, 216, 217, 96, 355, 376, 102, 232, 105, 106, 110, 113, 114, 117, 245, 119, 373, 124, 125, 127]
+
+
+# BATC 03 RND
+# REMOVIDO 109, 126, 262, 264
+#CASEIDS = [4, 6, 19, 33, 48, 52, 59, 62, 64, 66, 73, 76, 85, 88, 93, 97, 112, 118, 131, 137, 138, 143, 147, 148, 153, 158, 166, 169, 172, 181, 189, 190, 193, 200, 220, 222, 228, 239, 241, 244, 247, 248, 249, 250, 251, 253, 254, 259, 274, 281, 282, 288, 292, 293, 295, 305, 307, 310, 318, 319, 319, 320, 325, 326, 331, 332, 334, 336, 340, 342, 356, 358, 360, 367, 370, 377, 378, 403, 404, 411, 414, 418, 424 ]
 
 
 
@@ -31,7 +42,7 @@ def main():
     # Load all datasets
     session_list = []
     for id in CASEIDS:
-      ds = session.load_session(id, DATA_PATH, 'HYRO')
+      ds = session.load_session(id, DATA_PATH, RUN_SUFFIX)
       session_list.append(ds)
     print(f'{len(session_list)} cases loaded')
 
@@ -44,7 +55,7 @@ def main():
                    'lr6_train':     (0., 1.),
                    'lr3_test':      (0., 1.),
                    'lr6_test':      (0., 1.),
-                   'beta':          (50., 50.),
+                   'beta':          (0., 500.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -52,7 +63,7 @@ def main():
                   }
 
     bounds_rlwm = {'learning_rate': (0., 1.),
-                   'beta':          (50., 50.),
+                   'beta':          (0., 500.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -62,7 +73,7 @@ def main():
                   }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
-                    'beta':          (50, 50.),
+                    'beta':          (0, 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -73,7 +84,7 @@ def main():
 
     bounds_rlwma = {'alpha_rl':     (0., 1.),
                     'alpha_wm':     (1., 1.),
-                    'beta':         (50., 50.),
+                    'beta':         (0., 500.),
                     'decay':        (0., 1.),
                     'pers':         (0., 1.),
                     'eps':          (0., 1.),
@@ -82,7 +93,7 @@ def main():
                    }
 
     bounds_rlwmb = {'learning_rate': (0., 1.),
-                    'beta':          (50., 50.),
+                    'beta':          (0., 500.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -93,7 +104,7 @@ def main():
 
 
     bounds_wm = {'alpha_wm':      (1., 1.),
-                 'beta':          (50., 50.),
+                 'beta':          (0., 500.),
                  'decay':         (0., 1.),
                  'pers':          (0., 1.),
                  'eps':           (0., 1.),
@@ -103,8 +114,8 @@ def main():
 
 
     opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_rlwmi
-    opt_model_name = 'model_rlwmi'
+    opt_modelfunc = models.model_new1
+    opt_model_name = 'model_new1'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name

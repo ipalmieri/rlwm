@@ -57,7 +57,7 @@ def save_param_dict(filename, param_dict, func_dict=None):
   if func_dict:
     df_func = pd.DataFrame.from_dict(func_dict, orient='index', columns=['min_cost'])
   df_param = df_param.merge(df_func, how='left', left_index=True, right_index=True)
-  k = len(df_param.columns) - 2 # cols except caseid and min_cost
+  k = len(df_param.columns) - 1 # cols except caseid and min_cost
   # AIC = 2*k - 2*np.log(LLH) 
   # min_cost = -np.log(LLH)
   df_param['aic'] = 2.*k + 2.*df_param['min_cost']
