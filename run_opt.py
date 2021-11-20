@@ -8,7 +8,7 @@ import rlwm.optimization as optimization
 
 RUN_BATCH='batch01'
 RUN_SUFFIX='c'
-RUN_CNR='beta_50'
+RUN_CNR='beta_0-50'
 
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados', RUN_BATCH)
@@ -48,14 +48,14 @@ def main():
 
 
     bounds_classic = {'learning_rate': (0., 1.),
-                      'beta':          (50., 50)
+                      'beta':          (0., 50)
                      }
 
     bounds_best = {'lr3_train':     (0., 1.),
                    'lr6_train':     (0., 1.),
                    'lr3_test':      (0., 1.),
                    'lr6_test':      (0., 1.),
-                   'beta':          (0., 500.),
+                   'beta':          (0., 50.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -63,7 +63,7 @@ def main():
                   }
 
     bounds_rlwm = {'learning_rate': (0., 1.),
-                   'beta':          (0., 500.),
+                   'beta':          (0., 50.),
                    'decay':         (0., 1.),
                    'pers':          (0., 1.),
                    'eps':           (0., 1.),
@@ -84,7 +84,7 @@ def main():
 
     bounds_rlwma = {'alpha_rl':     (0., 1.),
                     'alpha_wm':     (1., 1.),
-                    'beta':         (0., 500.),
+                    'beta':         (0., 50.),
                     'decay':        (0., 1.),
                     'pers':         (0., 1.),
                     'eps':          (0., 1.),
@@ -93,7 +93,7 @@ def main():
                    }
 
     bounds_rlwmb = {'learning_rate': (0., 1.),
-                    'beta':          (0., 500.),
+                    'beta':          (0., 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -104,7 +104,7 @@ def main():
 
 
     bounds_wm = {'alpha_wm':      (1., 1.),
-                 'beta':          (0., 500.),
+                 'beta':          (0., 50.),
                  'decay':         (0., 1.),
                  'pers':          (0., 1.),
                  'eps':           (0., 1.),
@@ -112,10 +112,34 @@ def main():
                  'K':             (6., 6.)
                 }
 
+    bounds_new2 = {'learning_rate': (0., 1.),
+                    'beta':          (0, 50.),
+                    'decay':         (0., 1.),
+                    'pers':          (0., 1.),
+                    'eps':           (0., 1.),
+                    'init':          (0., 1.),
+                    'eta3_wm':       (0., 1.),
+                    'eta6_wm':       (0., 1.),
+                    'gamma_rl':      (0., 1.),
+                    'gamma_wm':      (0., 1.)
+                   }
 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_new1
-    opt_model_name = 'model_new1'
+    bounds_new3 = {'learning_rate': (0., 1.),
+                    'beta':          (0, 50.),
+                    'decay':         (0., 1.),
+                    'pers':          (0., 1.),
+                    'eps':           (0., 1.),
+                    'init':          (0., 1.),
+                    'eta3_wm':       (0., 1.),
+                    'eta6_wm':       (0., 1.),
+                    'gamma_rl':      (0., 6.),
+                    'gamma_wm':      (0., 6.)
+                   }
+
+
+    opt_bounds = bounds_new3
+    opt_modelfunc = models.model_new3
+    opt_model_name = 'model_new3'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name
