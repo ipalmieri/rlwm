@@ -560,7 +560,7 @@ class RLWMnew2(BaseModel):
             st_group = get_stimulus_group(st)
             for s, actions in self.__stmap.items():
                 if s != st and get_stimulus_group(s) == st_group:
-                    if s not in self.__known_answers and self.__known_answers[s] != ac:
+                    if s not in self.__known_answers or self.__known_answers[s] != ac:
                         # Change here to affect only one learning mechanism
                         self.__Q[s][ac] = self.__Q[s][ac]*self.gamma_rl
                         self.__W[s][ac] = self.__W[s][ac]*self.gamma_wm

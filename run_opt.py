@@ -137,9 +137,9 @@ def main():
                    }
 
 
-    opt_bounds = bounds_new3
-    opt_modelfunc = models.model_new3
-    opt_model_name = 'model_new3'
+    opt_bounds = bounds_new2
+    opt_modelfunc = models.model_new2
+    opt_model_name = 'model_new2'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name
