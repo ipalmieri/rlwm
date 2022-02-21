@@ -6,12 +6,12 @@ title: Reinforcement Learning and Working Memory models
 message: Please cite this software using these metadata.
 type: software
 authors:
-  - orcid: 'https://orcid.org/0000-0001-9401-9412'
-    given-names: Gibson
-    family-names: Weydmann
   - given-names: Igor
     family-names: Palmieri
     orcid: 'https://orcid.org/0000-0002-1739-008X'
+  - orcid: 'https://orcid.org/0000-0001-9401-9412'
+    given-names: Gibson
+    family-names: Weydmann
   - given-names: Reinaldo
     family-names: A. G Simoes
     orcid: 'https://orcid.org/0000-0002-3562-9306'
