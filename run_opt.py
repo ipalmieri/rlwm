@@ -5,10 +5,11 @@ import rlwm.models as models
 import rlwm.optsp as optsp
 import rlwm.optho as optho
 import rlwm.optimization as optimization
+import params
 
 RUN_BATCH='batch01'
 RUN_SUFFIX='c'
-RUN_CNR='beta_0-50'
+RUN_CNR='beta_0-500'
 
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados', RUN_BATCH)
@@ -19,19 +20,7 @@ OPT_REPS = 20
 OPT_EVALMAX = 1000
 
 
-# BaTCH 01
-CASEIDS = [1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 25, 26, 27, 29, 37, 49, 54, 57, 59, 62, 64, 66, 72, 76, 77, 79, 84, 91, 92, 94, 97, 102, 105, 110, 118, 127, 132, 153, 155, 159, 161, 164, 166, 172, 174, 175, 178, 179, 180, 181, 182, 184, 185, 187, 189, 195, 197, 200, 201, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 214, 215, 216, 217, 218, 220, 221, 223, 224, 226, 227]
-
-
-# BATCH 02
-#CASEIDS = [1, 130, 257, 8, 10, 140, 13, 142, 18, 20, 21, 150, 23, 406, 27, 155, 283, 285, 417, 37, 165, 167, 42, 44, 51, 179, 182, 55, 56, 183, 184, 186, 188, 314, 324, 71, 203, 80, 209, 82, 211, 337, 216, 217, 96, 355, 376, 102, 232, 105, 106, 110, 113, 114, 117, 245, 119, 373, 124, 125, 127]
-
-
-# BATC 03 RND
-# REMOVIDO 109, 126, 262, 264
-#CASEIDS = [4, 6, 19, 33, 48, 52, 59, 62, 64, 66, 73, 76, 85, 88, 93, 97, 112, 118, 131, 137, 138, 143, 147, 148, 153, 158, 166, 169, 172, 181, 189, 190, 193, 200, 220, 222, 228, 239, 241, 244, 247, 248, 249, 250, 251, 253, 254, 259, 274, 281, 282, 288, 292, 293, 295, 305, 307, 310, 318, 319, 319, 320, 325, 326, 331, 332, 334, 336, 340, 342, 356, 358, 360, 367, 370, 377, 378, 403, 404, 411, 414, 418, 424 ]
-
-
+CASEIDS = params.CASEIDS_BATCH01
 
 #CASEIDS = CASEIDS[:5]
 
@@ -73,7 +62,7 @@ def main():
                   }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
-                    'beta':          (0, 50.),
+                    'beta':          (0, 500.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -132,14 +121,14 @@ def main():
                     'init':          (0., 1.),
                     'eta3_wm':       (0., 1.),
                     'eta6_wm':       (0., 1.),
-                    'gamma_rl':      (0., 6.),
-                    'gamma_wm':      (0., 6.)
+                    'gamma_pos':      (0., 1.),
+                    'gamma_neg':      (0., 1.)
                    }
 
 
-    opt_bounds = bounds_new2
-    opt_modelfunc = models.model_new2
-    opt_model_name = 'model_new2'
+    opt_bounds = bounds_rlwmi
+    opt_modelfunc = models.model_new1
+    opt_model_name = 'model_new1'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name

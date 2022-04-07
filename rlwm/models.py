@@ -609,12 +609,11 @@ class RLWMnew3(BaseModel):
         self.init = 0.0                         # init bias param
         self.eta3_wm = 0.0                      # wm weight in policy calculation
         self.eta6_wm = 0.0                      # wm weight in policy calculation
-        self.gamma_rl = 1.0
-        self.gamma_wm = 1.0
+        self.gamma_pos = 0.0
+        self.gamma_neg = 0.0
         self.coupled = coupled                  # True for RL + WM interacting model
         self.__stmap = {}                       # Map of stimuli and respective actions
         self.__known_stimuli = set()            # stimuli already processed for init bias
-        self.__known_answers = {}
         self.__Q = {}     
         self.__W = {}
         self.__Q_init = 0.0     
@@ -646,15 +645,15 @@ class RLWMnew3(BaseModel):
             self.__Q[st][ac] = self.__Q_init + self.init*(1.0 - self.__Q_init)
             self.__known_stimuli.add(st)
         # Rewarding deduction/induction 
-        if st not in self.__known_answers and rt > 0:
-            st_group = get_stimulus_group(st)
-            for s, actions in self.__stmap.items():
-                if s != st and get_stimulus_group(s) == st_group:
-                    if s not in self.__known_answers or self.__known_answers[s] != ac:
-                        # Change here to affect only one learning mechanism
-                        self.__Q[s][ac] = self.__Q[s][ac]*(1. - self.gamma_rl/block_size)
-                        self.__W[s][ac] = self.__W[s][ac]*(1. - self.gamma_wm/block_size)
-            self.__known_answers[st] = ac        
+        st_group = get_stimulus_group(st)
+        for s, actions in self.__stmap.items():
+            if s != st and get_stimulus_group(st) == st_group:
+                if rt > 0:
+                    self.__Q[s][ac] = self.__Q[s][ac]*(1. - self.gamma_pos*3./block_size)
+                    self.__W[s][ac] = self.__W[s][ac]*(1. - self.gamma_pos*3./block_size)
+                else:
+                    self.__Q[s][ac] = self.__Q[s][ac]*(1. + self.gamma_neg*3./block_size)
+                    self.__W[s][ac] = self.__W[s][ac]*(1. + self.gamma_neg*3./block_size)
         # Delta calculation
         if self.coupled:
             delta = rt - (eta_wm*self.__W[st][ac] + (1.-eta_wm)*self.__Q[st][ac])
@@ -795,7 +794,7 @@ def model_new2(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, ga
 
 
 ## Model: interacting RL+WM version 3
-def model_new3(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, gamma_rl, gamma_wm):
+def model_new3(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, gamma_pos, gamma_neg):
     model = RLWMnew3(learning_rate, beta, coupled=True)
     model.phi = decay
     model.pers = pers
@@ -803,8 +802,8 @@ def model_new3(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, ga
     model.init = init
     model.eta3_wm = eta3_wm
     model.eta6_wm = eta6_wm
-    model.gamma_rl = gamma_rl
-    model.gamma_wm = gamma_wm
+    model.gamma_pos = gamma_pos
+    model.gamma_neg = gamma_neg
     return model
 
 
