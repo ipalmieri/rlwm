@@ -9,7 +9,7 @@ import params
 
 RUN_BATCH='batch01'
 RUN_SUFFIX='c'
-RUN_CNR='beta_0-500'
+RUN_CNR='beta_0-50'
 
 BASE_PATH = '/srv/black/data/rlwm'
 DATA_PATH = os.path.join(BASE_PATH, 'dados', RUN_BATCH)
@@ -62,7 +62,7 @@ def main():
                   }
 
     bounds_rlwmi = {'learning_rate': (0., 1.),
-                    'beta':          (0, 500.),
+                    'beta':          (0, 50.),
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
@@ -126,9 +126,9 @@ def main():
                    }
 
 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models.model_new1
-    opt_model_name = 'model_new1'
+    opt_bounds = bounds_new3
+    opt_modelfunc = models.model_new3
+    opt_model_name = 'model_new3'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name

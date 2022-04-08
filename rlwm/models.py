@@ -648,12 +648,13 @@ class RLWMnew3(BaseModel):
         st_group = get_stimulus_group(st)
         for s, actions in self.__stmap.items():
             if s != st and get_stimulus_group(st) == st_group:
-                if rt > 0:
+                if rt > 0.:
                     self.__Q[s][ac] = self.__Q[s][ac]*(1. - self.gamma_pos*3./block_size)
                     self.__W[s][ac] = self.__W[s][ac]*(1. - self.gamma_pos*3./block_size)
                 else:
-                    self.__Q[s][ac] = self.__Q[s][ac]*(1. + self.gamma_neg*3./block_size)
-                    self.__W[s][ac] = self.__W[s][ac]*(1. + self.gamma_neg*3./block_size)
+                    for a in [a for a in actions if a != ac]:
+                        self.__Q[s][a] = self.__Q[s][a]*(1. + self.gamma_neg*3./block_size)
+                        self.__W[s][a] = self.__W[s][a]*(1. + self.gamma_neg*3./block_size)
         # Delta calculation
         if self.coupled:
             delta = rt - (eta_wm*self.__W[st][ac] + (1.-eta_wm)*self.__Q[st][ac])
