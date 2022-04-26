@@ -88,6 +88,40 @@ def average_block_probs(session_list):
     bs_rt_avg_test = {bs: np.mean(rts_list, axis=0) for bs, rts_list in bs_rt_avg_test.items()}
 
     return bs_rt_avg_train, bs_rt_avg_test
+
+
+# Calcula a sequencia com o reward médio para cada tamanho de bloco e caseid 
+def average_caseid_block_probs(session_list):
+
+    id_bs_rt_train = {}
+    id_bs_rt_test = {}
+
+    for session in session_list:
+
+        bs_rt_train = defaultdict(list)
+        bs_rt_test = defaultdict(list)
+
+        #print("Aggragating session " + str(session.caseid))
+        st_rt_train, st_rt_test = aggregate_stimuli(session)
+
+        for st, rt_series in st_rt_train.items():
+            bs = session.get_blocksize(st)
+            bs_rt_train[bs].append(rt_series)
+
+        for st, rt_series in st_rt_test.items():
+            bs = session.get_blocksize(st)
+            bs_rt_test[bs].append(rt_series)
+ 
+        id_bs_rt_train[session.caseid] = {}
+        id_bs_rt_test[session.caseid] = {}
+
+        for bs, rts_list in bs_rt_train.items():
+            id_bs_rt_train[session.caseid][bs] = np.mean(rts_list, axis=0)
+
+        for bs, rts_list in bs_rt_test.items():
+            id_bs_rt_test[session.caseid][bs] = np.mean(rts_list, axis=0)
+
+    return id_bs_rt_train, id_bs_rt_test
     
 
 # Calcula a taxa de reward assintotica para cada tamanho de bloco 
