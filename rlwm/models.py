@@ -652,7 +652,7 @@ class RLWMnew3(BaseModel):
         # Rewarding deduction/induction 
         st_group = get_stimulus_group(st)
         for s, actions in self.__stmap.items():
-            if s != st and get_stimulus_group(st) == st_group:
+            if s != st and get_stimulus_group(s) == st_group:
                 if rt > 0.:
                     self.__Q_init_func[s][ac] = self.__Q_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
                     self.__W_init_func[s][ac] = self.__W_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
