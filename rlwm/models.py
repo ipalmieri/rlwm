@@ -606,7 +606,7 @@ class RLWMnew3(BaseModel):
         self.eps = 0.0                          # noise ratio
         self.phi = 0.0                          # forgetting ratio / decay
         self.pers = 0.0                         # perseveration param
-        #self.init = 0.0                         # init bias param
+        self.init = 0.0                         # init bias param
         self.eta3_wm = 0.0                      # wm weight in policy calculation
         self.eta6_wm = 0.0                      # wm weight in policy calculation
         self.gamma_pos = 0.0
@@ -618,8 +618,8 @@ class RLWMnew3(BaseModel):
         self.__W = {}
         self.__Q_init = 0.0     
         self.__W_init = 0.0
-        self.__Q_init_func = {}
-        self.__W_init_func = {}
+        #self.__Q_init_func = {}
+        #self.__W_init_func = {}
 
     def init_model(self, stimuli, actions):
         actions = set(actions)
@@ -630,8 +630,8 @@ class RLWMnew3(BaseModel):
         for st in stimuli:
             self.__Q[st] = {ac: self.__Q_init for ac in actions}
             self.__W[st] = {ac: self.__W_init for ac in actions}
-            self.__Q_init_func[st] = {ac: self.__Q_init for ac in actions}
-            self.__W_init_func[st] = {ac: self.__W_init for ac in actions}
+        #    self.__Q_init_func[st] = {ac: self.__Q_init for ac in actions}
+        #    self.__W_init_func[st] = {ac: self.__W_init for ac in actions}
 
 
     def learn_sample(self, stimulus, action, reward, block_size):
@@ -646,24 +646,20 @@ class RLWMnew3(BaseModel):
                     self.__Q[s][a] = (1.-self.phi)*self.__Q[s][a] + self.phi*self.__Q_init
                     self.__W[s][a] = (1.-self.phi)*self.__W[s][a] + self.phi*self.__W_init
         # Initial bias update  
-        #if st not in self.__known_stimuli:
-        #    self.__Q[st][ac] = self.__Q_init + self.init*(1.0 - self.__Q_init)
-        #    self.__known_stimuli.add(st)
+        if st not in self.__known_stimuli:
+            self.__Q[st][ac] = self.__Q_init + self.init*(1.0 - self.__Q_init)
+            self.__known_stimuli.add(st)
         # Rewarding deduction/induction 
         st_group = get_stimulus_group(st)
         for s, actions in self.__stmap.items():
             if s != st and get_stimulus_group(s) == st_group:
                 if rt > 0.:
-                    self.__Q_init_func[s][ac] = self.__Q_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
-                    #self.__W_init_func[s][ac] = self.__W_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
+                    self.__Q[s][ac] = self.__Q[s][ac]*(1. - self.gamma_pos*3./block_size)
+                    self.__W[s][ac] = self.__W[s][ac]*(1. - self.gamma_pos*3./block_size)
                 else:
                     for a in [a for a in actions if a != ac]:
-                        self.__Q_init_func[s][a] = self.__Q_init_func[s][a]*(1. + self.gamma_neg*3./block_size)
-                        #self.__W_init_func[s][a] = self.__W_init_func[s][a]*(1. + self.gamma_neg*3./block_size)
-        if st not in self.__known_stimuli:
-            self.__Q[st][ac] = self.__Q_init_func[st][ac]
-            #self.__W[st][ac] = self.__W_init_func[st][ac]
-            self.__known_stimuli.add(st)
+                        self.__Q[s][a] = self.__Q[s][a]*(1. + self.gamma_neg*3./block_size)
+                        self.__W[s][a] = self.__W[s][a]*(1. + self.gamma_neg*3./block_size)
         # Delta calculation
         if self.coupled:
             delta = rt - (eta_wm*self.__W[st][ac] + (1.-eta_wm)*self.__Q[st][ac])
@@ -804,12 +800,12 @@ def model_new2(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, ga
 
 
 ## Model: interacting RL+WM version 3
-def model_new3(learning_rate, beta, decay, pers, eps, eta3_wm, eta6_wm, gamma_pos, gamma_neg):
+def model_new3(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, gamma_pos, gamma_neg):
     model = RLWMnew3(learning_rate, beta, coupled=True)
     model.phi = decay
     model.pers = pers
     model.eps = eps
-    #model.init = init
+    model.init = init
     model.eta3_wm = eta3_wm
     model.eta6_wm = eta6_wm
     model.gamma_pos = gamma_pos
