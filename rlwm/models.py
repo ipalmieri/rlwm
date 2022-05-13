@@ -655,14 +655,14 @@ class RLWMnew3(BaseModel):
             if s != st and get_stimulus_group(s) == st_group:
                 if rt > 0.:
                     self.__Q_init_func[s][ac] = self.__Q_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
-                    self.__W_init_func[s][ac] = self.__W_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
+                    #self.__W_init_func[s][ac] = self.__W_init_func[s][ac]*(1. - self.gamma_pos*3./block_size)
                 else:
                     for a in [a for a in actions if a != ac]:
                         self.__Q_init_func[s][a] = self.__Q_init_func[s][a]*(1. + self.gamma_neg*3./block_size)
-                        self.__W_init_func[s][a] = self.__W_init_func[s][a]*(1. + self.gamma_neg*3./block_size)
+                        #self.__W_init_func[s][a] = self.__W_init_func[s][a]*(1. + self.gamma_neg*3./block_size)
         if st not in self.__known_stimuli:
             self.__Q[st][ac] = self.__Q_init_func[st][ac]
-            self.__W[st][ac] = self.__W_init_func[st][ac]
+            #self.__W[st][ac] = self.__W_init_func[st][ac]
             self.__known_stimuli.add(st)
         # Delta calculation
         if self.coupled:
