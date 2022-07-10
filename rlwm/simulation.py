@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 import copy
-from . import models, transformation
+from . import models_base, transformation
 
 #def simulate_model_random(model, response_map, n_trials):
 #    pass
@@ -43,7 +43,7 @@ def simulate_model_session(model, session):
 def simulate_session(model_func, params, session):
  
     #print(f'Params: {params}')
-    model = models.get_model(model_func, params)
+    model = models_base.get_model(model_func, params)
     model.init_model(session.possible_stimuli, session.possible_actions)
     model_session = simulate_model_session(model, session)
     return model_session
