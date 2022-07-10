@@ -5,7 +5,8 @@ import numpy as np
 import pickle
 import inspect
 import scipy.optimize as optimize
-from . import session, models, optimization
+from . import session, optimization
+from .models_base import get_model
 
 OPT_SCIPY_EVALMAX = 1000    # Max evaluations of a function in a repetition
 OPT_SCIPY_REPMAX = 100      # Max extra/failed repetitions of optimization
@@ -15,7 +16,7 @@ OPT_TOL = 1e-10
 def generate_optfunc(model_func, session):
     def opt_func(params):
         params = params.tolist()
-        model = models.get_model(model_func, params)
+        model = get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
         cost_total = optimization.cost_half_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')

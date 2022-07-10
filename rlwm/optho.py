@@ -1,7 +1,8 @@
 import os
 import hyperopt
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
-from . import models, optimization
+from . import optimization
+from .models_base import get_model
 import pickle
 
 OPT_HYPEROPT_EVALSTEP = 100
@@ -9,7 +10,7 @@ OPT_HYPEROPT_EVALSTEP = 100
 # Generator of each cost function
 def score_dict_gen(model_func, session):
     def opt_func(params):
-        model = models.get_model(model_func, params)
+        model = get_model(model_func, params)
         model.init_model(session.possible_stimuli, session.possible_actions)
         loss = optimization.cost_half_llh(model, session)
         #print(f'Params: {params}, Cost: {cost_total}')

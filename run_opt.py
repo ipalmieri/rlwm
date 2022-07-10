@@ -1,7 +1,8 @@
 import os
 from multiprocessing import freeze_support
 import rlwm.session as session
-import rlwm.models as models
+import rlwm.models_collins as models_collins
+import rlwm.models_new as models_new
 import rlwm.optsp as optsp
 import rlwm.optho as optho
 import rlwm.optimization as optimization
@@ -22,7 +23,7 @@ OPT_EVALMAX = 1000
 
 CASEIDS = params.CASEIDS_BATCH01
 
-CASEIDS = CASEIDS[:10]
+#CASEIDS = CASEIDS[:10]
 
 
 
@@ -118,6 +119,18 @@ def main():
                     'decay':         (0., 1.),
                     'pers':          (0., 1.),
                     'eps':           (0., 1.),
+                    'init':          (0., 1.),
+                    'eta3_wm':       (0., 1.),
+                    'eta6_wm':       (0., 1.),
+                    'gamma_rl':      (0., 6.),
+                    'gamma_wm':      (0., 6.)
+                   }
+
+    bounds_new4 = {'learning_rate': (0., 1.),
+                    'beta':          (0, 50.),
+                    'decay':         (0., 1.),
+                    'pers':          (0., 1.),
+                    'eps':           (0., 1.),
                     #'init':          (0., 1.),
                     'eta3_wm':       (0., 1.),
                     'eta6_wm':       (0., 1.),
@@ -127,7 +140,7 @@ def main():
 
 
     opt_bounds = bounds_new3
-    opt_modelfunc = models.model_new3
+    opt_modelfunc = models_new.model_new3
     opt_model_name = 'model_new3'
     
     opt_solver = 'scipy'
