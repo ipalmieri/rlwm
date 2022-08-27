@@ -8,8 +8,8 @@ import rlwm.optho as optho
 import rlwm.optimization as optimization
 import params
 
-RUN_BATCH='batch01'
-RUN_SUFFIX='c'
+RUN_BATCH='batch03rnd'
+RUN_SUFFIX='HYRO' #'c'
 RUN_CNR='beta_0-50'
 
 BASE_PATH = '/srv/black/data/rlwm'
@@ -21,7 +21,7 @@ OPT_REPS = 20
 OPT_EVALMAX = 1000
 
 
-CASEIDS = params.CASEIDS_BATCH01
+CASEIDS = params.CASEIDS_BATCH03
 
 #CASEIDS = CASEIDS[:10]
 
@@ -139,9 +139,9 @@ def main():
                    }
 
 
-    opt_bounds = bounds_new3
-    opt_modelfunc = models_new.model_new3
-    opt_model_name = 'model_new3'
+    opt_bounds = bounds_rlwmi
+    opt_modelfunc = models_collins.model_rlwmi
+    opt_model_name = 'model_rlwmi'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name
