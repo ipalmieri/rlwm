@@ -3,9 +3,8 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
-trainfile_root = '-RLWM-Parte 1_'
-testfile_root = '-RLWM-Parte 2_'
 
+DATA_HEADER = ['Stimulus_Pair', 'response', 'correct', 'Block']
 
 class DataSession():
     '''Base class containing experiment data'''
@@ -39,8 +38,7 @@ class DataSession():
             response_dict = {trial[0]: trial[1] for trial in train_set if trial[2] > 0}
         block_col = [blocksize_dict[st] for st in session.possible_stimuli]
         respo_col = [response_dict[st] for st in session.possible_stimuli]
-        session.response_map = pd.DataFrame(zip(session.possible_stimuli, respo_col, block_col),
-                                            columns=['Stimulus_Pair', 'correct_response', 'Block'])
+        session.response_map = pd.DataFrame(zip(session.possible_stimuli, respo_col, block_col), columns=['Stimulus_Pair', 'correct_response', 'Block'])
         session.response_map.set_index['Stimulus_Pair']
         return session
 
@@ -51,10 +49,16 @@ class DataSession():
         session.possible_actions = df_train['correct_response'].unique().tolist()
         session.response_map = df_train.groupby(['Stimulus_Pair', 'correct_response', 'Block']).size().reset_index()
         session.response_map = session.response_map[['Stimulus_Pair', 'correct_response', 'Block']].set_index('Stimulus_Pair')
-        session.train_set = list(zip(df_train['Stimulus_Pair'], df_train['response'], df_train['correct'], df_train['Block']))
-        session.test_set = list(zip(df_test['Stimulus_Pair'], df_test['response'], df_test['correct'], df_test['Block']))
-        session.st_maxlen_train = np.max([c for s, c in Counter([s[0] for s in session.train_set]).items()])
-        session.st_maxlen_test = np.max([c for s, c in Counter([s[0] for s in session.test_set]).items()])
+        session.train_set = df_train[DATA_HEADER].values.tolist()
+        session.test_set = df_test[DATA_HEADER].values.tolist()
+        session.st_maxlen_train = (
+            np.max(list(Counter(s[0] for s in session.train_set).values()))
+            if session.train_set else 0
+        )
+        session.st_maxlen_test = (
+            np.max(list(Counter(s[0] for s in session.test_set).values()))
+            if session.test_set else 0
+        )
         return session
 
 
@@ -72,19 +76,4 @@ class tsDataSession(DataSession):
         session.test_ts = df_test['response_time'].tolist()
         return session
 
-
-def load_dataset(caseid, data_path, suffix=''):
-        global trainfile_root
-        global testfile_root
-        train_filename = str(caseid) + trainfile_root + suffix + '.csv'
-        test_filename = str(caseid) + testfile_root + suffix + '.csv'
-        df_train = pd.read_csv(os.path.join(data_path, train_filename), sep=',')
-        df_test = pd.read_csv(os.path.join(data_path, test_filename), sep=',')
-        return df_train, df_test
-
-
-def load_session(caseid, data_path, suffix=''):
-    df_train, df_test = load_dataset(caseid, data_path, suffix)
-    ds = tsDataSession.from_df(caseid, df_train, df_test)
-    return ds
 

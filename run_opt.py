@@ -6,10 +6,10 @@ import rlwm.models_new as models_new
 import rlwm.optsp as optsp
 import rlwm.optho as optho
 import rlwm.optimization as optimization
+import tools.data_loader as data_loader
 import params
 
-RUN_BATCH='batch03rnd'
-RUN_SUFFIX='HYRO' #'c'
+RUN_BATCH='batch04'
 RUN_CNR='beta_0-50'
 
 BASE_PATH = '/srv/black/data/rlwm'
@@ -21,21 +21,16 @@ OPT_REPS = 20
 OPT_EVALMAX = 1000
 
 
-CASEIDS = params.CASEIDS_BATCH03
-
-#CASEIDS = CASEIDS[:10]
+#CASEIDS = params.CASEIDS_BATCH03
+CASEIDS = []
 
 
 
 def main():
 
     # Load all datasets
-    session_list = []
-    for id in CASEIDS:
-      ds = session.load_session(id, DATA_PATH, RUN_SUFFIX)
-      session_list.append(ds)
+    session_list = data_loader.load_batch(DATA_PATH, CASEIDS)
     print(f'{len(session_list)} cases loaded')
-
 
     bounds_classic = {'learning_rate': (0., 1.),
                       'beta':          (0., 50)
