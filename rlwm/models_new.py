@@ -411,7 +411,7 @@ def model_new3(learning_rate, beta, decay, pers, eps, init, eta3_wm, eta6_wm, ga
 
 ## Model: interacting RL+WM version 4
 def model_new4(learning_rate, beta, decay, pers, eps, eta3_wm, eta6_wm, gamma_pos, gamma_neg):
-    model = RLWMnew3(learning_rate, beta, coupled=True)
+    model = RLWMnew4(learning_rate, beta, coupled=True)
     model.phi = decay
     model.pers = pers
     model.eps = eps
