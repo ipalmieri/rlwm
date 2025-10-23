@@ -128,7 +128,7 @@ def load_batch_folder(data_path):
 
 def load_batch(data_path, caseids=[]):
 
-    if not len(caseids) > 0:
+    if caseids is None or not len(caseids) > 0:
         return load_batch_folder(data_path)
 
     ret_batch = []

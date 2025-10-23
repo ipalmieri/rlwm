@@ -24,7 +24,7 @@ OPT_EVALMAX = 1000
 
 
 #CASEIDS = params.CASEIDS_BATCH03
-CASEIDS = []
+CASEIDS = None
 
 
 
