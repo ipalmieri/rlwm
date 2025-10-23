@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 from multiprocessing import Pool
-from . import optsp, optho
+from . import optsp
+#from . import optho
 
 OPT_DEFAULT_SOLVER='scipy'
 
