@@ -38,6 +38,9 @@ def recalculate_blocks(df_train, df_test):
     df_train[bl_colname] = df_train[st_colname].apply(get_bs)
     df_test[bl_colname] = df_test[st_colname].apply(get_bs)
 
+    #if not pd.concat([df_train[bl_colname], df_test[bl_colname]]).isin([3, 6]).all():
+    #    print("Invalid values for block size detected")
+
 
 
 def load_session_file(caseid, data_path, filename_train, filename_test=None):
@@ -85,7 +88,7 @@ def load_batch_folder(data_path):
     fn_map = defaultdict(lambda: {'train': None, 'test': None}.copy())
 
     files_list = [fn for fn in os.listdir(data_path) if fn.endswith(FN_EXT)]
-
+    
     for fn in files_list:
  
         cid = None

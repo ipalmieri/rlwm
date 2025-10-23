@@ -9,6 +9,8 @@ import rlwm.optimization as optimization
 import tools.data_loader as data_loader
 import params
 
+NUM_JOBS=4
+
 RUN_BATCH='batch04'
 RUN_CNR='beta_0-50'
 
@@ -155,7 +157,7 @@ def main():
                                                  solver=opt_solver,
                                                  models_path=MODEL_PATH,
                                                  model_name=opt_model_name,
-                                                 n_jobs=8
+                                                 n_jobs=NUM_JOBS
                                           )
 
     optimization.save_param_dict(os.path.join(OUTPUT_PATH, opt_filename), params, loss)
