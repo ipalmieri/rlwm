@@ -7,9 +7,11 @@ Reinforcement Learning and Working Memory models
 
 Tested on Debian Bookworm:
 
-python3.9.2
-libblas-dev 
-liblapack-dev 
-gfortran
+Dependencies:
 
-Can also run in Python 3.10, but needs numpy=1.21.0
+- python3.12.12
+- libblas-dev 
+- liblapack-dev 
+- gfortran
+
+Install required packages using 'pip -r requirements.txt'
