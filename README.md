@@ -7,7 +7,7 @@ Reinforcement Learning and Working Memory models
 
 Tested on Debian Bookworm:
 
-python3.9
+python3.9.2
 libblas-dev 
 liblapack-dev 
 gfortran
