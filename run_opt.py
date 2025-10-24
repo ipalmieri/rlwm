@@ -4,7 +4,7 @@ import rlwm.session as session
 import rlwm.models_collins as models_collins
 import rlwm.models_new as models_new
 import rlwm.optsp as optsp
-import rlwm.optho as optho
+#import rlwm.optho as optho
 import rlwm.optimization as optimization
 import tools.data_loader as data_loader
 import params
@@ -24,7 +24,7 @@ OPT_EVALMAX = 1000
 
 
 #CASEIDS = params.CASEIDS_BATCH03
-CASEIDS = []
+CASEIDS = None
 
 
 
