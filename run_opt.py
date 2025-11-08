@@ -23,9 +23,8 @@ OPT_REPS = 20
 OPT_EVALMAX = 1000
 
 
-#CASEIDS = params.CASEIDS_BATCH03
-CASEIDS = None
-
+CASEIDS = params.CASEIDS_BATCH04
+#CASEIDS = None
 
 
 def main():
