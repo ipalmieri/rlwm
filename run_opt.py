@@ -135,9 +135,9 @@ def main():
                    }
 
 
-    opt_bounds = bounds_rlwmi
-    opt_modelfunc = models_collins.model_rlwmi
-    opt_model_name = 'model_rlwmi'
+    opt_bounds = bounds_mew4
+    opt_modelfunc = models_new.model_new4
+    opt_model_name = 'model_new4'
     
     opt_solver = 'scipy'
     opt_filename = 'param_' + opt_solver + '_' + opt_model_name
